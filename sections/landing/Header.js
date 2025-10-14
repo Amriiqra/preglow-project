@@ -25,10 +25,6 @@ export default function Header() {
               <Button className="bg-secondary px-8 py-6 text-lg rounded-full">
                 Start For Free
               </Button>
-              <Button variant="ghost" className="text-white px-8 py-6 text-lg rounded-lg flex items-center">
-                Learn More
-                <ChevronRight className="ml-2" />
-              </Button>
             </div>
           </div>
           <div className="relative pt-16">

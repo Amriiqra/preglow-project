@@ -226,26 +226,24 @@ function SidebarTrigger({
   onClick,
   ...props
 }) {
-  const { isMobile, toggleSidebar } = useSidebar()
+  const { toggleSidebar } = useSidebar()
 
   return (
     <>
-      {isMobile ? (
-        <Button
-          data-sidebar="trigger"
-          data-slot="sidebar-trigger"
-          variant="ghost"
-          size="icon"
-          className={cn("size-7", className)}
-          onClick={(event) => {
-            onClick?.(event)
-            toggleSidebar()
-          }}
-          {...props}>
-          <PanelLeftIcon />
-          <span className="sr-only">Toggle Sidebar</span>
-        </Button>
-      ) : null}
+      <Button
+        data-sidebar="trigger"
+        data-slot="sidebar-trigger"
+        variant="ghost"
+        size="icon"
+        className={cn("size-7", className)}
+        onClick={(event) => {
+          onClick?.(event)
+          toggleSidebar()
+        }}
+        {...props}>
+        <PanelLeftIcon />
+        <span className="sr-only">Toggle Sidebar</span>
+      </Button>
     </>
   );
 }

@@ -16,7 +16,7 @@ export default function Navbar() {
                 <li className="cursor-pointer">Contact</li>
             </ul>
             <Button
-                className="rounded-full bg-secondary"
+                className="rounded-full bg-secondary w-32"
                 onClick={() => router.push("/login")}
             >
                 Login
