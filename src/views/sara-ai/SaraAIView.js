@@ -20,25 +20,25 @@ export default function SaraAIView() {
             <div className="w-full max-w-4xl mx-auto pt-20 space-y-12">
 
                 <div className="text-center space-y-2">
-                    <h1 className="text-4xl font-bold text-[#B55B77]">
+                    <h1 className="text-4xl font-bold text-primary">
                         Hello, {userName}
                     </h1>
-                    <p className="text-2xl text-[#8C4E61]">
+                    <p className="text-2xl text-primary">
                         Can I help you with anything?
                     </p>
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-4">
-                    <Button variant="outline" className="bg-white/90 text-[#B55B77] border-[#FCD0CB] hover:bg-white text-base py-6 px-6 shadow-md">
+                    <Button variant="outline" className="bg-white/90 text-primary border-[#FCD0CB] hover:text-secondary text-base py-6 px-6 shadow-md">
                         Mood Check-in
                     </Button>
-                    <Button variant="outline" className="bg-white/90 text-[#B55B77] border-[#FCD0CB] hover:bg-white text-base py-6 px-6 shadow-md">
+                    <Button variant="outline" className="bg-white/90 text-primary border-[#FCD0CB] hover:text-secondary text-base py-6 px-6 shadow-md">
                         Write a Diary Entry
                     </Button>
-                    <Button variant="outline" className="bg-white/90 text-[#B55B77] border-[#FCD0CB] hover:bg-white text-base py-6 px-6 shadow-md">
+                    <Button variant="outline" className="bg-white/90 text-primary border-[#FCD0CB] hover:text-secondary text-base py-6 px-6 shadow-md">
                         Set a Reminder
                     </Button>
-                    <Button variant="outline" className="bg-white/90 text-[#B55B77] border-[#FCD0CB] hover:bg-white text-base py-6 px-6 shadow-md">
+                    <Button variant="outline" className="bg-white/90 text-primary border-[#FCD0CB] hover:text-secondary text-base py-6 px-6 shadow-md">
                         Learn Something New
                     </Button>
                 </div>

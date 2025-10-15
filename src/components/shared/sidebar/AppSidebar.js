@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image";
 import { FaRegFaceGrin } from "react-icons/fa6";
-import { BsCalendarDate } from "react-icons/bs";    
-import { MdHomeFilled, MdOutlineInventory } from "react-icons/md";
+import { MdHomeFilled, MdOutlineForum, MdOutlineInventory } from "react-icons/md";
 import { RiSparkling2Fill } from "react-icons/ri";
 import { NavMain } from "./NavMain";
 import NavFooter from "./NavFooter";
+import { IoInfinite } from "react-icons/io5";
 
 const data = {
     navMain: [
@@ -20,6 +20,16 @@ const data = {
             title: "Dashboard",
             url: "/dashboard",
             icon: <MdHomeFilled />,
+        },
+        {
+            title: "Forum",
+            url: "/forum",
+            icon: <MdOutlineForum />,
+        },
+        {
+            title: "Meditation",
+            url: "/meditation",
+            icon: <IoInfinite />,
         },
         {
             title: "Mood",

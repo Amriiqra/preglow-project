@@ -11,7 +11,27 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const dailyIntakeData = [
     { day: "Sen", intake: 1500 },
@@ -26,7 +46,7 @@ const dailyIntakeData = [
 const barChartConfig = {
     intake: {
         label: "Kalori",
-        color: "#B55B77",
+        color: "#FF90A7",
     },
 };
 
@@ -45,7 +65,7 @@ const weeklyCaloricData = [
 const lineChartConfig = {
     calories: {
         label: "Kalori",
-        color: "#2D5C6B4D",
+        color: "#FF90A7",
     },
 };
 
@@ -107,37 +127,37 @@ export default function NutritionView() {
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-secondary flex items-center justify-between">
                         Today's Nutrition Overview
-                        <Button size="sm" className="w-1/5 text-white bg-secondary hover:bg-secondary/90 p-5">
+                        <Button size="sm" className="w-1/5 text-white bg-primary hover:bg-primary/90 p-5">
                             View Detailed Report
                         </Button>
                     </CardTitle>
-                    <p className="text-sm text-black">See how your meals stack up today.</p>
+                    <p className="text-sm text-secondary">See how your meals stack up today.</p>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                <Card className="text-center gap-0 rounded-md shadow-none">
+                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
                                     <p>Calories Consumed</p>
                                     <p className="text-2xl font-medium">1,500</p>
-                                    <p className="text-sm text-black">+200</p>
+                                    <p className="text-sm">+200</p>
                                 </Card>
-                                <Card className="text-center gap-0 rounded-md shadow-none">
+                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
                                     <p>Proteins</p>
                                     <p className="text-2xl font-medium">50g</p>
-                                    <p className="text-sm text-black">+10g</p>
+                                    <p className="text-sm">+10g</p>
                                 </Card>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <Card className="text-center gap-0 rounded-md shadow-none">
+                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
                                     <p>Carbohydrates</p>
                                     <p className="text-2xl font-medium">290g</p>
-                                    <p className="text-sm text-black">-5g</p>
+                                    <p className="text-sm">-5g</p>
                                 </Card>
-                                <Card className="text-center gap-0 rounded-md shadow-none">
+                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
                                     <p>Fats</p>
                                     <p className="text-2xl font-medium">30g</p>
-                                    <p className="text-sm text-black">+5g</p>
+                                    <p className="text-sm">+5g</p>
                                 </Card>
                             </div>
                         </div>
@@ -153,7 +173,7 @@ export default function NutritionView() {
                                     />} />
                                     <Bar
                                         dataKey="intake"
-                                        fill="var(--color-secondary)"
+                                        fill="#ff90a7"
                                         radius={[4, 4, 0, 0]}
                                     />
                                 </BarChart>
@@ -177,12 +197,52 @@ export default function NutritionView() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Meals</h2>
-                    <Button variant="outline" className="text-primary border-dashed border-gray-400 hover:bg-primary/5">
-                        <Plus className="w-4 h-4 mr-2" /> Add New Meal
-                    </Button>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" className="text-white bg-primary border-gray-400 hover:bg-primary/90 hover:text-white">
+                                <Plus className="w-4 h-4 mr-2" /> Add New Meal
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Add New Meal</DialogTitle>
+                                <DialogDescription>
+                                    Fill in the details below to add a new meal to your nutrition.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4">
+                                <div className="grid gap-3">
+                                    <Label htmlFor="username-1">Category</Label>
+                                    <Select>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select a category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value="breakfast">Breakfast</SelectItem>
+                                                <SelectItem value="lunch">Lunch</SelectItem>
+                                                <SelectItem value="dinner">Dinner</SelectItem>
+                                                <SelectItem value="snack">Snack</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-3">
+                                    <Label htmlFor="food-item">Food Name</Label>
+                                    <Input id="food-item" name="food-item" placeholder="Food Name" />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button type="submit">Save changes</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                     <p className="text-sm text-gray-500 mt-2">View the meals you have consumed this week</p>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 border p-10 mt-2 rounded-2xl">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 border p-10 mt-2 rounded-2xl bg-white">
                         {mealData.map((meal, index) => (
                             <MealItem key={index} time={meal.time} calories={meal.calories} icon={meal.icon} />
                         ))}

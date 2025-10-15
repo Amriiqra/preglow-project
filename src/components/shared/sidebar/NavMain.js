@@ -33,7 +33,7 @@ export function NavMain({ items }) {
                                     <SidebarMenuButton
                                         tooltip={item.title}
                                         isActive={isActive}
-                                        className="[&>svg]:size-6"
+                                        className="[&>svg]:size-6 text-secondary font-medium"
                                     >
                                         {item.icon ?? null}
                                         <span className="text-base">{item.title}</span>

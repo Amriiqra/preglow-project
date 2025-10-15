@@ -16,6 +16,7 @@ import {
 const moods = [
   { label: "Happy", icon: "😊" },
   { label: "Sad", icon: "😞" },
+  { label: "Anxious", icon: "😟" },
   { label: "Angry", icon: "😡" },
   { label: "Bored", icon: "😒" },
   { label: "Irritated", icon: "😤" },
@@ -38,27 +39,6 @@ const moodChartConfig = {
   Bored: { label: "Bored", color: "#F2F2F2" }
 };
 
-const reminders = [
-  {
-    time: "7:00 AM",
-    items: [
-      { title: "Take medicine", subtext: "2 tablet", color: "#FEEAE9", iconBg: "#FCD0CB" }
-    ]
-  },
-  {
-    time: "12:00 AM",
-    items: [
-      { title: "Take medicine", subtext: "2 tablet", color: "#FEEAE9", iconBg: "#FCD0CB" },
-    ]
-  },
-  {
-    time: "17:00 AM",
-    items: [
-      { title: "Take medicine", subtext: "2 tablet", color: "#FEEAE9", iconBg: "#FCD0CB" }
-    ]
-  }
-];
-
 const MoodSelector = () => (
   <div className="flex flex-wrap gap-x-6 gap-y-4 py-3 w-full">
     {moods.map((mood) => (
@@ -78,7 +58,7 @@ export default function DashboardDefault() {
   return (
     <div className="p-8 space-y-8 min-h-screen bg-[#F8F8F8]">
       <header className="space-y-1">
-        <h1 className="text-3xl font-bold text-gray-800">DASHBOARD</h1>
+        <h1 className="text-3xl font-bold text-secondary">DASHBOARD</h1>
         <p className="text-gray-600">Hi, Wishing you a calm and happy day.</p>
       </header>
 
@@ -86,9 +66,9 @@ export default function DashboardDefault() {
         <div className="lg:col-span-2">
           <Card className="shadow-md h-full">
             <CardHeader>
-              <CardTitle className="text-2xl">Today's Mood & Journal</CardTitle>
+              <CardTitle className="text-2xl text-secondary">Today's Mood & Journal</CardTitle>
               <p className="text-sm text-gray-500 flex items-center gap-2">
-                <Calendar className="w-4 h-4" /> 30 September 2025
+                30 September 2025
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -101,12 +81,12 @@ export default function DashboardDefault() {
                 <p className="font-medium">Want to add more details?</p>
                 <Textarea
                   placeholder="Write about your day, your feelings, or anything on your mind..."
-                  className="min-h-[120px] bg-gray-50"
+                  className="min-h-[120px] bg-gray-50 resize-none"
                 />
               </div>
 
               <Button
-                className="w-full bg-secondary hover:bg-secondary/90 text-white py-6 text-base font-semibold rounded-full"
+                className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-base font-semibold rounded-full"
               >
                 Save Today's Entry
               </Button>
@@ -117,59 +97,58 @@ export default function DashboardDefault() {
         <div>
           <Card className="shadow-md w-full h-full">
             <CardHeader>
-              <CardTitle className="text-xl">Mood Recap</CardTitle>
+              <CardTitle className="text-2xl text-secondary">Mood Recap</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-start gap-4 mb-4 text-sm">
+              <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
                 <Button variant="outline" size="sm" className="bg-primary/10 text-primary border-primary">Week</Button>
                 <Button variant="outline" size="sm" className="text-gray-600">Month</Button>
                 <Button variant="outline" size="sm" className="text-gray-600">Year</Button>
               </div>
-              <div className="flex flex-col items-center justify-center w-full">
-                <div className="space-y-2 flex items-center justify-between w-full">
+              <div className="flex items-start justify-center w-full">
+                <div className="space-y-10 flex flex-col items-start w-full">
                   <div>
                     <p className="text-sm text-gray-500">Total moods</p>
                     <p className="text-4xl font-bold">{totalMoodEntries}</p>
                   </div>
-                  <ul className="text-sm space-y-1 pt-2">
-                    <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#FFC0CB]"></span> Happy</li>
-                    <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#B55B77]"></span> Sensitive</li>
-                    <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#F2F2F2] border"></span> Bored</li>
-                  </ul>
-                </div>
+                  <div className="w-[220px] h-[250px] relative">
+                    <ChartContainer
+                      config={moodChartConfig}
+                      className="aspect-square w-full h-full"
+                    >
+                      <PieChart width={220} height={250} margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
 
-                <div className="w-[220px] h-[220px] relative">
-                  <ChartContainer
-                    config={moodChartConfig}
-                    className="aspect-square w-full h-full"
-                  >
-                    <PieChart width={220} height={220} margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
-                      <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-
-                      <Pie
-                        data={moodChartData}
-                        dataKey="value"
-                        nameKey="type"
-                        innerRadius={70}
-                        outerRadius={100}
-                        stroke="none"
-                        paddingAngle={2}
-                      >
-                        <Label
-                          value={`${mainMood.value}%`}
-                          position="center"
-                          className="fill-gray-800 text-lg font-bold"
-                        />
-                        <Label
-                          value={mainMood.type}
-                          position="center"
-                          dy={22}
-                          className="fill-gray-500 text-sm"
-                        />
-                      </Pie>
-                    </PieChart>
-                  </ChartContainer>
+                        <Pie
+                          data={moodChartData}
+                          dataKey="value"
+                          nameKey="type"
+                          innerRadius={70}
+                          outerRadius={100}
+                          stroke="none"
+                          paddingAngle={2}
+                        >
+                          <Label
+                            value={`${mainMood.value}%`}
+                            position="center"
+                            className="fill-gray-800 text-2xl font-bold"
+                          />
+                          <Label
+                            value={mainMood.type}
+                            position="center"
+                            dy={22}
+                            className="fill-gray-500 text-sm"
+                          />
+                        </Pie>
+                      </PieChart>
+                    </ChartContainer>
+                  </div>
                 </div>
+                <ul className="text-sm space-y-1 pt-2">
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#FFC0CB]"></span> Happy</li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#B55B77]"></span> Sensitive</li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#F2F2F2] border"></span> Bored</li>
+                </ul>
               </div>
             </CardContent>
           </Card>

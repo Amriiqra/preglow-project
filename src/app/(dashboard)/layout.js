@@ -10,7 +10,7 @@ export async function Layout({ children }) {
     return (
         <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
-            <main className="w-full">
+            <main className="w-full overflow-y-hidden">
                 <SidebarTrigger />
                 {children}
             </main>
