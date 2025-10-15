@@ -27,18 +27,13 @@ const data = {
             icon: <FaRegFaceGrin />,
         },
         {
-            title: "Reminder",
-            url: "/reminder",
-            icon: <BsCalendarDate />,
-        },
-        {
             title: "Nutrition",
             url: "/nutrition",
             icon: <MdOutlineInventory />,
         },
         {
-            title: "Chat Bot",
-            url: "/chat-bot",
+            title: "Sara AI",
+            url: "/sara-ai",
             icon: <RiSparkling2Fill />,
         },
     ]

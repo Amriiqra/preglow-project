@@ -179,6 +179,18 @@ export default function DashboardDefault() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <Card className="shadow-md h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="space-y-1">
+                <CardTitle className="text-2xl">Today's affirmations</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-primary text-3xl font-bold text-center">"I am worthy of good things and deserve comfort and prosperity".</p>
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          <Card className="shadow-md h-auto">
             <CardHeader>
               <CardTitle className="text-2xl">Today's Nutrition Focus</CardTitle>
               <CardDescription>
@@ -200,39 +212,6 @@ export default function DashboardDefault() {
                   <ArrowRight className="mt-1" />
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div>
-          <Card className="shadow-md h-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="space-y-1">
-                <p className="text-sm text-gray-500">September 30</p>
-                <CardTitle className="text-2xl">Today reminders</CardTitle>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-gray-100 rounded-full hover:bg-gray-200"
-              >
-                <Plus className="w-5 h-5 text-gray-800" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {reminders.map((reminder, index) => (
-                <div key={index} className="bg-[#E9959429] p-4 rounded-lg mb-4 text-black">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5" />
-                    <p className="text-sm font-medium">{reminder.time}</p>
-                  </div>
-                  {reminder.items.map((item, idx) => (
-                    <div key={idx}>
-                      <p className="text-gray-800 font-semibold">{item.title}</p>
-                    </div>
-                  ))}
-                </div>
-              ))}
             </CardContent>
           </Card>
         </div>

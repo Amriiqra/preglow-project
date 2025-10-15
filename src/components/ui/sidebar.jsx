@@ -510,7 +510,7 @@ function SidebarMenuButton({
   return (
     <Tooltip>
       {isActive && (
-        <div className="absolute -left-2 bg-primary w-4 h-16" />
+        <div className="absolute -left-2 bg-primary w-3 h-16" />
       )}
       <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent
