@@ -20,7 +20,7 @@ export default function Otp() {
     };
 
     return (
-        <div className="min-h-screen relative overflow-hidden">
+        <div className="min-h-screen relative overflow-hidden pt-14">
             <div className="absolute inset-0">
                 <Image
                     src="/assets/images/background_login.png"

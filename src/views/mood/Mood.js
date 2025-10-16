@@ -77,12 +77,12 @@ export default function MoodView() {
     return (
         <div className="p-8 space-y-8 min-h-screen bg-[#F8F8F8]">
             <header className="mb-8">
-                <h1 className="text-3xl font-bold text-secondary">DAILY MOODS FEELING</h1>
+                <h1 className="text-2xl lg:text-3xl font-bold text-secondary">DAILY MOODS FEELING</h1>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="space-y-6">
-                    <Card className="shadow-md w-full h-full">
+                <div className="space-y-6 w-full col-span-2 lg:col-span-1">
+                    <Card className="w-full h-full lg:px-0 px-2">
                         <CardHeader>
                             <CardTitle className="text-2xl text-secondary">Mood Recap</CardTitle>
                         </CardHeader>
@@ -95,8 +95,8 @@ export default function MoodView() {
                             <div className="flex items-start justify-center w-full">
                                 <div className="space-y-10 flex flex-col items-start w-full">
                                     <div>
-                                        <p className="text-sm text-gray-500">Total moods</p>
-                                        <p className="text-4xl font-bold">{totalMoodEntries}</p>
+                                        <p className="text-sm text-black">Total moods</p>
+                                        <p className="text-4xl font-bold text-secondary">{totalMoodEntries}</p>
                                     </div>
                                     <div className="w-[220px] h-[250px] relative">
                                         <ChartContainer
@@ -118,13 +118,13 @@ export default function MoodView() {
                                                     <Label
                                                         value={`${mainMood.value}%`}
                                                         position="center"
-                                                        className="fill-gray-800 text-2xl font-bold"
+                                                        className="fill-black text-4xl font-bold"
                                                     />
                                                     <Label
                                                         value={mainMood.type}
                                                         position="center"
                                                         dy={22}
-                                                        className="fill-gray-500 text-sm"
+                                                        className="fill-gray-500 text-base"
                                                     />
                                                 </Pie>
                                             </PieChart>

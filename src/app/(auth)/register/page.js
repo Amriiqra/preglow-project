@@ -16,7 +16,7 @@ export default function Register() {
     const [password, setPassword] = useState('');
 
     return (
-        <div className="min-h-screen relative overflow-hidden">
+        <div className="min-h-screen relative overflow-hidden pt-12">
             <div className="absolute inset-0">
                 <Image
                     src="/assets/images/background_login.png"

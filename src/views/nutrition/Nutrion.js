@@ -87,16 +87,16 @@ const mealData = [
 const ProductCard = ({ category, name, protein }) => (
     <Card className="p-3 shadow-sm h-full flex flex-col justify-between relative" style={{ minHeight: '120px' }}>
         {category === "Food" &&
-            <span className="absolute -top-6 -left-3 text-5xl">🍛</span>
+            <span className="absolute -top-6 -left-3 text-4xl lg:text-5xl">🍛</span>
         }
         {category === "Drink" &&
-            <span className="absolute -top-3 -left-5 text-5xl">🥤</span>
+            <span className="absolute -top-3 -left-5 text-4xl lg:text-5xl">🥤</span>
         }
         {category === "Snack" &&
-            <span className="absolute -top-4 -left-5 text-5xl">🍎</span>
+            <span className="absolute -top-4 -left-5 text-4xl lg:text-5xl">🍎</span>
         }
         {category === "Supplement" &&
-            <span className="absolute -top-4 -left-5 text-5xl">💊</span>
+            <span className="absolute -top-4 -left-5 text-4xl lg:text-5xl">💊</span>
         }
         <div className="text-right text-xs text-gray-500 font-medium">{category}</div>
         <div>
@@ -118,16 +118,13 @@ const MealItem = ({ time, calories, icon }) => (
 
 export default function NutritionView() {
     return (
-        <div className="p-8 space-y-8 min-h-screen bg-[#F8F8F8]">
-            <header className="mb-8">
-                <h1 className="text-3xl font-bold text-secondary">DAILY NUTRITION TRACKER</h1>
-            </header>
-
-            <Card className="shadow-md">
+        <div className="p-4 lg:p-8 space-y-5 lg:space-y-8 min-h-screen bg-[#F8F8F8]">
+            <h1 className="text-xl lg:text-3xl font-bold text-secondary">DAILY NUTRITION TRACKER</h1>
+            <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-secondary flex items-center justify-between">
+                    <CardTitle className="text-2xl font-bold text-secondary flex lg:flex-row flex-col lg:items-center items-start lg:justify-between">
                         Today's Nutrition Overview
-                        <Button size="sm" className="w-1/5 text-white bg-primary hover:bg-primary/90 p-5">
+                        <Button size="sm" className="lg:w-1/5 w-full lg:my-0 my-5 text-white bg-primary hover:bg-primary/90 p-5">
                             View Detailed Report
                         </Button>
                     </CardTitle>

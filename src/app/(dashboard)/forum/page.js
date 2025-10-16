@@ -4,8 +4,8 @@ import ForumView from "@/views/forum/ForumView";
 // ==============================|| Forum ||============================== //
 
 export const metadata = {
-    title: "Forum Tracker",
-    description: "Forum Tracker",
+    title: "Forum",
+    description: "Forum",
 };
 
 const Forum = () => {

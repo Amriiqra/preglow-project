@@ -1,18 +1,25 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function NavMain({ items }) {
     const pathname = usePathname();
+    const { isMobile, setOpen, setOpenMobile } = useSidebar();
+
+    const handleNavigation = () => {
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    };
 
     return (
         <SidebarGroup>
@@ -29,7 +36,11 @@ export function NavMain({ items }) {
 
                         return (
                             <SidebarMenuItem key={item.title}>
-                                <Link href={item.url} passHref>
+                                <Link
+                                    href={item.url}
+                                    passHref
+                                    onClick={handleNavigation}
+                                >
                                     <SidebarMenuButton
                                         tooltip={item.title}
                                         isActive={isActive}

@@ -8,11 +8,11 @@ export default function Blog() {
     return (
         <section id="blog" className="py-20 bg-gray-50">
             <div className="container mx-auto px-6 max-w-7xl">
-                <h2 className="text-4xl font-bold text-left text-gray-800">
+                <h2 className="text-2xl lg:text-4xl font-bold text-left text-secondary">
                     Read Our Latest Articles
                 </h2>
                 <div className='w-1/6'>
-                    <Separator className="border-2 border-primary mb-16 mt-3" />
+                    <Separator className="border-2 border-secondary mb-16 mt-3" />
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
                     {[1, 2, 3, 4, 5, 6].map((item) => (

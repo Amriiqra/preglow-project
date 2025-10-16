@@ -12,6 +12,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import Link from "next/link";
 
 const moods = [
   { label: "Happy", icon: "😊" },
@@ -56,15 +57,15 @@ export default function DashboardDefault() {
   const mainMood = moodChartData[0];
 
   return (
-    <div className="p-8 space-y-8 min-h-screen bg-[#F8F8F8]">
+    <div className="p-8 space-y-8 min-h-screen bg-[#F8F8F8] font-sans">
       <header className="space-y-1">
-        <h1 className="text-3xl font-bold text-secondary">DASHBOARD</h1>
+        <h1 className="text-3xl font-bold text-secondary font-sans">DASHBOARD</h1>
         <p className="text-gray-600">Hi, Wishing you a calm and happy day.</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Card className="shadow-md h-full">
+          <Card className="h-full">
             <CardHeader>
               <CardTitle className="text-2xl text-secondary">Today's Mood & Journal</CardTitle>
               <p className="text-sm text-gray-500 flex items-center gap-2">
@@ -95,7 +96,7 @@ export default function DashboardDefault() {
         </div>
 
         <div>
-          <Card className="shadow-md w-full h-full">
+          <Card className="w-full h-full">
             <CardHeader>
               <CardTitle className="text-2xl text-secondary">Mood Recap</CardTitle>
             </CardHeader>
@@ -108,8 +109,8 @@ export default function DashboardDefault() {
               <div className="flex items-start justify-center w-full">
                 <div className="space-y-10 flex flex-col items-start w-full">
                   <div>
-                    <p className="text-sm text-gray-500">Total moods</p>
-                    <p className="text-4xl font-bold">{totalMoodEntries}</p>
+                    <p className="text-sm text-black">Total moods</p>
+                    <p className="text-4xl font-bold text-secondary">{totalMoodEntries}</p>
                   </div>
                   <div className="w-[220px] h-[250px] relative">
                     <ChartContainer
@@ -131,13 +132,13 @@ export default function DashboardDefault() {
                           <Label
                             value={`${mainMood.value}%`}
                             position="center"
-                            className="fill-gray-800 text-2xl font-bold"
+                            className="fill-black text-4xl font-bold"
                           />
                           <Label
                             value={mainMood.type}
                             position="center"
                             dy={22}
-                            className="fill-gray-500 text-sm"
+                            className="fill-gray-500 text-base"
                           />
                         </Pie>
                       </PieChart>
@@ -155,41 +156,57 @@ export default function DashboardDefault() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
-          <Card className="shadow-md h-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 lg:pb-2">
               <div className="space-y-1">
-                <CardTitle className="text-2xl">Today's affirmations</CardTitle>
+                <CardTitle className="text-2xl text-secondary">Today's affirmations</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-primary text-3xl font-bold text-center">"I am worthy of good things and deserve comfort and prosperity".</p>
+              <p className="text-primary text-2xl lg:text-3xl font-bold text-center text-kaisei lg:pb-0 pb-5">"I am worthy of good things and deserve comfort and prosperity".</p>
             </CardContent>
           </Card>
         </div>
-        <div>
-          <Card className="shadow-md h-auto">
+        <div className="lg:col-span-2">
+          <Card className="h-auto">
             <CardHeader>
-              <CardTitle className="text-2xl">Today's Nutrition Focus</CardTitle>
-              <CardDescription>
-                Essential for preventing anemia and supporting your baby's blood development.
-              </CardDescription>
-              <p className="text-sm text-secondary pt-2">
+              <CardTitle className="text-2xl text-secondary">Today's Nutrition Report</CardTitle>
+              <CardDescription className="text-secondary">
                 Try adding one of these to your meals today:
-              </p>
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 h-full">
-              <div className="flex gap-2 items-center justify-start">
-                <Button variant="secondary" className="w-1/4 bg-[#9FE2BF] text-white hover:bg-[#8CD8A7]">Spinach</Button>
-                <Button variant="secondary" className="w-1/4 bg-[#F4A460] text-white hover:bg-[#E9967A]">Lean Meat</Button>
-                <Button variant="secondary" className="w-1/4 bg-[#DDA0DD] text-white hover:bg-[#C9A0DC]">Lentils</Button>
+              <div className="space-y-4">
+                <div className="grid lg:grid-cols-4 gap-4">
+                  <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
+                    <p>Calories Consumed</p>
+                    <p className="text-2xl font-medium">1,500</p>
+                    <p className="text-sm">+200</p>
+                  </Card>
+                  <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
+                    <p>Proteins</p>
+                    <p className="text-2xl font-medium">50g</p>
+                    <p className="text-sm">+10g</p>
+                  </Card>
+                  <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
+                    <p>Carbohydrates</p>
+                    <p className="text-2xl font-medium">290g</p>
+                    <p className="text-sm">-5g</p>
+                  </Card>
+                  <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
+                    <p>Fats</p>
+                    <p className="text-2xl font-medium">30g</p>
+                    <p className="text-sm">+5g</p>
+                  </Card>
+                </div>
               </div>
               <div className="flex items-end justify-end h-3/4">
-                <Button variant="link" className="text-sm p-0 h-auto text-secondary">
+                <Link href={"/nutrition"} className="flex items-center gap-2 text-sm p-0 h-auto text-secondary">
                   Explore More Healthy Foods
-                  <ArrowRight className="mt-1" />
-                </Button>
+                  <ArrowRight size={16} />
+                </Link>
               </div>
             </CardContent>
           </Card>

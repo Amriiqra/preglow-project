@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function Footer() {
     return (
-        <footer className="bg-white text-black py-16">
+        <footer id='footer' className="bg-white text-black py-16">
             <div className="container px-6 max-w-7xl mx-auto">
                 <div className="grid md:grid-cols-4 gap-12">
                     <div className='col-span-2'>
@@ -83,7 +83,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800 mt-12 pt-8 text-center text-black">
-                    <p>&copy; 2025 Preplow. All rights reserved.</p>
+                    <p>&copy; 2025 Preglow. All rights reserved.</p>
                 </div>
             </div>
         </footer>

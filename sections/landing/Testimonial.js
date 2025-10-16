@@ -66,7 +66,7 @@ export default function Testimonial() {
 
 
     return (
-        <section className="relative w-full h-[450px] overflow-hidden">
+        <section className="relative w-full h-[450px] overflow-hidden" id='testimonial'>
 
             <div className="hidden lg:block absolute inset-y-0 w-[450px] py-4 overflow-hidden z-0">
                 <img
@@ -79,7 +79,7 @@ export default function Testimonial() {
             <div className="relative max-w-7xl mx-auto h-full flex items-center px-4 mt-5">
 
                 <Carousel
-                    opts={{
+                    opts={{ 
                         align: "start",
                     }}
                     setApi={setApi}

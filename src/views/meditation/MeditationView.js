@@ -163,16 +163,18 @@ export default function MeditationView() {
                                     {formatTime(timer)}
                                 </p>
                                 {timer < 0 ? (
-                                    <Button
-                                        onClick={goToPreviousStep}
-                                        variant="ghost"
-                                        className="text-white bg-primary text-lg px-10 py-7 rounded-full border w-full transition-transform transform hover:scale-105 opacity-80"
-                                    >
-                                        Back
-                                    </Button>
-                                ) : (
                                     <>
                                         <span className='bg-green-100 opacity-80 text-green-500 p-2 rounded-full'>Session Finished</span>
+                                        <Button
+                                            onClick={goToPreviousStep}
+                                            variant="ghost"
+                                            className="text-white bg-primary text-lg px-10 py-7 rounded-full border w-full transition-transform transform hover:scale-105 opacity-80"
+                                        >
+                                            Back
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
                                         <Button
                                             onClick={goToPreviousStep}
                                             variant="ghost"
@@ -232,7 +234,7 @@ export default function MeditationView() {
                 {renderContent()}
             </div>
 
-            <div className="absolute top-8 right-8 z-20 space-x-2">
+            <div className="absolute top-4 left-8 z-20 space-x-2">
                 <Button
                     onClick={toggleMute}
                     variant="secondary"
