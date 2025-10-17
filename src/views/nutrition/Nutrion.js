@@ -126,27 +126,27 @@ const MealItem = ({ time, calories, icon }) => (
 );
 
 const FeaturedRecentMeal = ({ data }) => (
-    <div className="p-4 mt-4 h-full flex flex-col">
+    <div className="lg:p-4  mt-4 h-full flex flex-col">
         <h1 className="text-lg font-bold text-gray-800 mb-4">{data.name}</h1>
         <div className="grid grid-cols-2 gap-4 flex-grow">
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
-                <p className="text-2xl text-gray-500">Calories Consumed</p>
-                <p className="text-xl font-bold text-gray-800">{data.calories}</p>
+                <p className="lg:text-2xl text-xl text-gray-500">Calories Consumed</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data.calories}</p>
                 <p className="text-xs text-green-500">{data.caloriesDiff}</p>
             </div>
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
-                <p className="text-2xl text-gray-500">Proteins</p>
-                <p className="text-xl font-bold text-gray-800">{data.proteins}</p>
+                <p className="lg:text-2xl text-xl text-gray-500">Proteins</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data.proteins}</p>
                 <p className="text-xs text-green-500">{data.proteinsDiff}</p>
             </div>
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
-                <p className="text-2xl text-gray-500">Carbohydrates</p>
-                <p className="text-xl font-bold text-gray-800">{data.carbohydrates}</p>
+                <p className="lg:text-2xl text-xl text-gray-500">Carbohydrates</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data.carbohydrates}</p>
                 <p className="text-xs text-red-500">{data.carbohydratesDiff}</p>
             </div>
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
-                <p className="text-2xl text-gray-500">Fats</p>
-                <p className="text-xl font-bold text-gray-800">{data.fats}</p>
+                <p className="lg:text-2xl text-xl text-gray-500">Fats</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data.fats}</p>
                 <p className="text-xs text-green-500">{data.fatsDiff}</p>
             </div>
         </div>
@@ -238,7 +238,7 @@ export default function NutritionView() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 **items-stretch**">
-                <div className="p-4 **h-full**">
+                <div className="p-4 **h-full** mb-30">
                     <h2 className="text-xl font-bold text-gray-800">Recent Meals</h2>
                     <p className="text-sm text-gray-500 mb-4">View the meals you have consumed this week</p>
 
@@ -290,7 +290,7 @@ export default function NutritionView() {
 
                 </div>
 
-                <div className="h-full space-y-4">
+                <div className="h-full space-y-4 mb-20">
                     <h2 className="text-xl font-bold text-gray-800 mb-4">Caloric Intake Over the Week</h2>
 
                     <Card className="shadow-none border-2 border-gray-100 p-6 rounded-2xl relative overflow-hidden">
