@@ -206,22 +206,22 @@ export default function DashboardDefault() {
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Calories Consumed</p>
                     <p className="text-2xl font-medium">1,500</p>
-                    <p className="text-sm">+200</p>
+                    <p className="text-sm text-green-500">+200</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Proteins</p>
                     <p className="text-2xl font-medium">50g</p>
-                    <p className="text-sm">+10g</p>
+                    <p className="text-sm text-green-500">+10g</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Carbohydrates</p>
                     <p className="text-2xl font-medium">290g</p>
-                    <p className="text-sm">-5g</p>
+                    <p className="text-sm text-green-500">+5g</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Fats</p>
                     <p className="text-2xl font-medium">30g</p>
-                    <p className="text-sm">+5g</p>
+                    <p className="text-sm text-green-500">+5g</p>
                   </Card>
                 </div>
               </div>
