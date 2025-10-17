@@ -14,6 +14,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const router = useRouter();
 
     return (
         <div className="min-h-screen relative overflow-hidden pt-16">
@@ -82,6 +83,9 @@ export default function Login() {
 
                             <Button
                                 type="submit"
+                                onClick={() => {
+                                    router.push('/dashboard');
+                                }}
                                 className="w-full h-12 bg-secondary hover:bg-secondary/90 text-white font-medium text-lg rounded-full"
                             >
                                 Log In
