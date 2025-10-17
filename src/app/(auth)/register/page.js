@@ -48,13 +48,13 @@ export default function Register() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="pregnance-age" className="text-sm font-medium text-gray-700">
-                                        Pregnance Age
+                                    <Label htmlFor="pregnancy-date" className="text-sm font-medium text-gray-700">
+                                        Pregnancy date
                                     </Label>
                                     <Input
-                                        id="pregnance-age"
+                                        id="pregnancy-date"
                                         type="date"
-                                        placeholder="Enter Pregnance Age"
+                                        placeholder="Enter Pregnancy Date"
                                         // value={email}
                                         // onChange={(e) => setEmail(e.target.value)}
                                         className="h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
