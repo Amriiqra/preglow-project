@@ -167,8 +167,8 @@ export default function Navbar() {
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
                             <div className="flex items-start flex-col">
-                                <span className="text-xs">Username</span>
-                                <span className="text-xs">30 Week</span>
+                                <span className="text-sm">Username</span>
+                                <span className="text-xs text-gray-400">30 Week</span>
                             </div>
                         </div>
                         <div className="flex items-center justify-start gap-2 cursor-pointer"

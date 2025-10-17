@@ -75,7 +75,7 @@ export default function MoodView() {
     const mainMood = moodChartData[0];
 
     return (
-        <div className="p-8 space-y-8 min-h-screen bg-[#F8F8F8]">
+        <div className="p-4 sm:p-8 space-y-8 min-h-screen bg-[#F8F8F8]">
             <header className="mb-8">
                 <h1 className="text-2xl lg:text-3xl font-bold text-secondary">DAILY MOODS FEELING</h1>
             </header>

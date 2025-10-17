@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +18,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus } from "lucide-react";
+import { Plus, X, Camera } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import ImageUploadPreview from "@/components/shared/UploadImage";
 
 const forumThreads = [
     { title: "Tips for better sleep?", content: "Saya mengalami susah tidur sejak trimester kedua. Ada tips posisi atau rutinitas sebelum tidur?", replies: 15, time: "Posted 3 hours ago", author: "Anonymous" },
@@ -67,6 +70,22 @@ const ForumThreadItem = ({ title, content, replies, time, author, router }) => (
 
 export default function ForumView() {
     const router = useRouter();
+    const [imageFile, setImageFile] = useState(null);
+
+    const handleImageChange = useCallback((event) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+        }
+    }, []);
+
+    const handleRemoveImage = useCallback(() => {
+        setImageFile(null);
+        const inputElement = document.getElementById('image-upload');
+        if (inputElement) {
+            inputElement.value = '';
+        }
+    }, []);
 
     return (
         <div className="p-4 lg:p-8 space-y-8 min-h-screen bg-[#F8F8F8]">
@@ -76,7 +95,7 @@ export default function ForumView() {
                     <DialogTrigger asChild>
                         <Button className="bg-primary text-white text-base py-2 px-4 hover:bg-primary/90">
                             Add Forum
-                            <Plus className="size-4" />
+                            <Plus className="size-4 ml-2" />
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[600px]">
@@ -88,13 +107,30 @@ export default function ForumView() {
                         </DialogHeader>
                         <div className="grid gap-4">
                             <div className="grid gap-3">
-                                <Label htmlFor="username-1">Title</Label>
-                                <Input id="forum-title" name="forum-title" placeholder="Forum Title" />
+                                <Label htmlFor="forum-title">Title</Label>
+                                <Input
+                                    id="forum-title"
+                                    name="forum-title"
+                                    placeholder="Forum Title"
+                                    className="bg-gray-50 focus-visible:ring-[#B55B77]"
+                                />
                             </div>
+
                             <div className="grid gap-3">
                                 <Label htmlFor="forum-content">Content</Label>
-                                <Textarea id="forum-content" name="forum-content" placeholder="Forum Content" className="min-h-[200px] resize-none" />
+                                <Textarea
+                                    id="forum-content"
+                                    name="forum-content"
+                                    placeholder="Tuliskan konten forum di sini..."
+                                    className="min-h-[150px] resize-none pt-3.5 bg-gray-50 focus-visible:ring-[#B55B77]"
+                                />
                             </div>
+
+                            <ImageUploadPreview
+                                imageFile={imageFile}
+                                onImageChange={handleImageChange}
+                                onRemoveImage={handleRemoveImage}
+                            />
                         </div>
                         <DialogFooter>
                             <DialogClose asChild>
@@ -108,7 +144,7 @@ export default function ForumView() {
 
             <div className="space-y-1">
                 <Card className="shadow-sm">
-                    <CardContent className="grid grid-cols-1 lg:grid-cols-2 lg:gap-8 gap-2">
+                    <CardContent className="grid grid-cols-1 lg:grid-cols-2 lg:gap-8 gap-2 p-4 lg:p-6">
                         {forumThreads.map((thread, index) => (
                             <ForumThreadItem
                                 key={index}

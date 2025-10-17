@@ -101,7 +101,7 @@ export default function Testimonial() {
                                 <div className="h-full flex items-center p-2">
                                     <Card className="w-full relative z-10 p-0 rounded-xl border h-full">
                                         <CardContent className="p-6">
-                                            <div className='relative pt-8 h-[180px]'>
+                                            <div className='relative pt-8 h-auto'>
                                                 <div className='absolute -top-6 left-0 text-6xl text-pink-100 font-serif'>“</div>
                                                 <p className="text-lg text-gray-800 font-medium italic mb-6">
                                                     "{testimonial.quote}"

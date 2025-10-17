@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,24 +41,34 @@ const moodChartConfig = {
   Bored: { label: "Bored", color: "#F2F2F2" }
 };
 
-const MoodSelector = () => (
-  <div className="flex flex-wrap gap-x-6 gap-y-4 py-3 w-full">
-    {moods.map((mood) => (
-      <div key={mood.label} className="text-center">
-        <p className="text-3xl">{mood.icon}</p>
-        <span className="text-sm text-gray-600">{mood.label}</span>
-      </div>
-    ))}
+const MoodSelector = ({ selectedMood, onSelectMood }) => (
+  <div className="flex flex-wrap lg:gap-x-5 gap-x-4 gap-y-4 py-3 w-full">
+    {moods.map((mood) => {
+      const isSelected = selectedMood === mood.label;
+      return (
+        <div
+          key={mood.label}
+          className={`text-center cursor-pointer p-1 rounded-md transition-all ${isSelected ? 'bg-primary/10 ring-2 ring-primary scale-110' : 'hover:bg-gray-100'
+            }`}
+          onClick={() => onSelectMood(mood.label)}
+        >
+          <p className="text-3xl">{mood.icon}</p>
+          <span className="text-sm text-gray-600">{mood.label}</span>
+        </div>
+      );
+    })}
   </div>
 );
 
 export default function DashboardDefault() {
   const totalMoodEntries = 7;
-
   const mainMood = moodChartData[0];
 
+  const [selectedMood, setSelectedMood] = useState(null);
+  const [selectedDuration, setSelectedDuration] = useState('Week');
+
   return (
-    <div className="p-8 space-y-8 min-h-screen bg-[#F8F8F8] font-sans">
+    <div className="p-4 sm:p-8 space-y-8 min-h-screen bg-[#F8F8F8] font-sans">
       <header className="space-y-1">
         <h1 className="text-3xl font-bold text-secondary font-sans">DASHBOARD</h1>
         <p className="text-gray-600">Hi, Wishing you a calm and happy day.</p>
@@ -75,7 +86,7 @@ export default function DashboardDefault() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <p className="font-medium">Select the mood that best fits your day.</p>
-                <MoodSelector />
+                <MoodSelector selectedMood={selectedMood} onSelectMood={setSelectedMood} />
               </div>
 
               <div className="space-y-2">
@@ -102,9 +113,21 @@ export default function DashboardDefault() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
-                <Button variant="outline" size="sm" className="bg-primary/10 text-primary border-primary">Week</Button>
-                <Button variant="outline" size="sm" className="text-gray-600">Month</Button>
-                <Button variant="outline" size="sm" className="text-gray-600">Year</Button>
+                {['Week', 'Month', 'Year'].map((duration) => (
+                  <Button
+                    key={duration}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedDuration(duration)}
+                    className={
+                      selectedDuration === duration
+                        ? "bg-primary/10 text-primary border-primary font-semibold"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }
+                  >
+                    {duration}
+                  </Button>
+                ))}
               </div>
               <div className="flex items-start justify-center w-full">
                 <div className="space-y-10 flex flex-col items-start w-full">

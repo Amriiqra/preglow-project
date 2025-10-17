@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 
 export default function Blog() {
@@ -31,9 +32,11 @@ export default function Blog() {
                                 <p className="text-gray-600 mb-4 line-clamp-3">
                                     Discover the key nutrients and foods that will support you and your baby during the crucial first trimester.
                                 </p>
-                                <Button className="bg-secondary hover:bg-gray-900 text-white rounded-lg w-full">
-                                    Learn More
-                                </Button>
+                                <Link href="/blog/1">
+                                    <Button className="bg-primary hover:bg-primary/90 text-white rounded-lg w-full">
+                                        Learn More
+                                    </Button>
+                                </Link>
                             </CardContent>
                         </Card>
                     ))}

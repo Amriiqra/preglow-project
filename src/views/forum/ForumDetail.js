@@ -38,7 +38,16 @@ export default function ForumDetail() {
                             Tips for better sleep?
                         </h3>
 
-                        <div className='flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-3 lg:mt-4'>
+                        <div className='w-full h-48 sm:h-64 md:h-72 lg:h-96 my-6 relative'>
+                            <Image
+                                src="/assets/images/nature.jpeg"
+                                alt='Forum Post Image'
+                                fill
+                                className="object-cover rounded-lg"
+                            />
+                        </div>
+
+                        <div className='flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-3'>
                             <div className="flex items-center gap-2">
                                 <Avatar className="w-6 h-6 lg:w-8 lg:h-8">
                                     <AvatarImage src="https://github.com/evilrabbit.png" />
@@ -53,15 +62,6 @@ export default function ForumDetail() {
                             <p className='text-xs sm:text-sm'>Maret 20, 2025</p>
                             <p className="text-xs">•</p>
                             <p className='text-xs sm:text-sm'>22 Replies</p>
-                        </div>
-
-                        <div className='w-full h-48 sm:h-64 md:h-72 lg:h-96 my-6 relative'>
-                            <Image
-                                src="/assets/images/nature.jpeg"
-                                alt='Forum Post Image'
-                                fill
-                                className="object-cover rounded-lg"
-                            />
                         </div>
 
                         <p className="text-base lg:text-lg text-black mt-6 leading-relaxed text-justify">
