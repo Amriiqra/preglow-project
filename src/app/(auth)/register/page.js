@@ -42,8 +42,8 @@ export default function Register() {
                                         id="username"
                                         type="text"
                                         placeholder="Enter Username"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        // value={email}
+                                        // onChange={(e) => setEmail(e.target.value)}
                                         className="h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
                                     />
                                 </div>
@@ -53,10 +53,10 @@ export default function Register() {
                                     </Label>
                                     <Input
                                         id="pregnance-age"
-                                        type="number"
+                                        type="date"
                                         placeholder="Enter Pregnance Age"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        // value={email}
+                                        // onChange={(e) => setEmail(e.target.value)}
                                         className="h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
                                     />
                                 </div>
@@ -69,8 +69,8 @@ export default function Register() {
                                     id="email"
                                     type="email"
                                     placeholder="Enter Email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    // value={email}
+                                    // onChange={(e) => setEmail(e.target.value)}
                                     className="h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
                                 />
                             </div>
@@ -84,8 +84,8 @@ export default function Register() {
                                         id="password"
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Enter Password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        // value={password}
+                                        // onChange={(e) => setPassword(e.target.value)}
                                         className="h-12 px-4 pr-12 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
                                     />
                                     <button
