@@ -90,7 +90,7 @@ const nasiGorengData = {
     fats: "30g",
     caloriesDiff: "+200",
     proteinsDiff: "+10g",
-    carbohydratesDiff: "-5g",
+    carbohydratesDiff: "+5g",
     fatsDiff: "+5g"
 };
 
@@ -142,7 +142,7 @@ const FeaturedRecentMeal = ({ data }) => (
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
                 <p className="lg:text-2xl text-xl text-gray-500">Carbohydrates</p>
                 <p className="lg:text-xl text-lg font-bold text-gray-800">{data.carbohydrates}</p>
-                <p className="text-xs text-red-500">{data.carbohydratesDiff}</p>
+                <p className="text-xs text-green-500">{data.carbohydratesDiff}</p>
             </div>
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
                 <p className="lg:text-2xl text-xl text-gray-500">Fats</p>
