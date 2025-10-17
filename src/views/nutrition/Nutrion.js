@@ -193,7 +193,7 @@ export default function NutritionView() {
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Carbohydrates</p>
                                     <p className="text-3xl font-bold text-gray-800">290g</p>
-                                    <p className="text-xs text-red-500">-5g</p>
+                                    <p className="text-xs text-green-500">+5g</p>
                                 </Card>
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Fats</p>
