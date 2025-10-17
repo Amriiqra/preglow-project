@@ -4,13 +4,12 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { BarChart, Bar, AreaChart, Area } from "recharts";
+import { BarChart, Bar, AreaChart, Area, XAxis } from "recharts";
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Separator } from "@/components/ui/separator";
 import {
     Dialog,
     DialogClose,
@@ -28,7 +27,6 @@ import {
     SelectContent,
     SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
@@ -84,8 +82,20 @@ const mealData = [
     { time: "Snack", calories: 100, icon: "🍎" },
 ];
 
+const nasiGorengData = {
+    name: "Nasi Goreng",
+    calories: "1,500",
+    proteins: "50g",
+    carbohydrates: "290g",
+    fats: "30g",
+    caloriesDiff: "+200",
+    proteinsDiff: "+10g",
+    carbohydratesDiff: "-5g",
+    fatsDiff: "+5g"
+};
+
 const ProductCard = ({ category, name, protein }) => (
-    <Card className="p-3 shadow-sm h-full flex flex-col justify-between relative" style={{ minHeight: '120px' }}>
+    <Card className="p-3 shadow-sm h-full flex flex-col justify-between relative border-2 border-gray-100" style={{ minHeight: '120px' }}>
         {category === "Food" &&
             <span className="absolute -top-6 -left-3 text-4xl lg:text-5xl">🍛</span>
         }
@@ -110,8 +120,36 @@ const MealItem = ({ time, calories, icon }) => (
     <div className="text-center">
         <span className="text-2xl">{icon}</span>
         <p className="text-lg font-bold text-gray-800">{calories}</p>
-        <p className="text-base font-semibold text-secondary">{time}</p>
+        <p className="text-base font-semibold text-primary">{time}</p>
         <p className="text-xs text-gray-500">Calories</p>
+    </div>
+);
+
+const FeaturedRecentMeal = ({ data }) => (
+    <div className="p-4 mt-4 h-full flex flex-col">
+        <h1 className="text-lg font-bold text-gray-800 mb-4">{data.name}</h1>
+        <div className="grid grid-cols-2 gap-4 flex-grow">
+            <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
+                <p className="text-2xl text-gray-500">Calories Consumed</p>
+                <p className="text-xl font-bold text-gray-800">{data.calories}</p>
+                <p className="text-xs text-green-500">{data.caloriesDiff}</p>
+            </div>
+            <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
+                <p className="text-2xl text-gray-500">Proteins</p>
+                <p className="text-xl font-bold text-gray-800">{data.proteins}</p>
+                <p className="text-xs text-green-500">{data.proteinsDiff}</p>
+            </div>
+            <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
+                <p className="text-2xl text-gray-500">Carbohydrates</p>
+                <p className="text-xl font-bold text-gray-800">{data.carbohydrates}</p>
+                <p className="text-xs text-red-500">{data.carbohydratesDiff}</p>
+            </div>
+            <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
+                <p className="text-2xl text-gray-500">Fats</p>
+                <p className="text-xl font-bold text-gray-800">{data.fats}</p>
+                <p className="text-xs text-green-500">{data.fatsDiff}</p>
+            </div>
+        </div>
     </div>
 );
 
@@ -119,51 +157,57 @@ const MealItem = ({ time, calories, icon }) => (
 export default function NutritionView() {
     return (
         <div className="p-4 lg:p-8 space-y-5 lg:space-y-8 min-h-screen bg-[#F8F8F8]">
-            <h1 className="text-xl lg:text-3xl font-bold text-secondary">DAILY NUTRITION TRACKER</h1>
-            <Card>
+
+            <h1 className="text-2xl font-bold text-gray-800">DAILY NUTRITION TRACKER</h1>
+
+            <Card className="rounded-2xl shadow-lg border-none">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-secondary flex lg:flex-row flex-col lg:items-center items-start lg:justify-between">
-                        Today's Nutrition Overview
-                        <Button size="sm" className="lg:w-1/5 w-full lg:my-0 my-5 text-white bg-primary hover:bg-primary/90 p-5">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <CardTitle className="text-xl font-bold text-gray-800">
+                                Today's Nutrition Overview
+                            </CardTitle>
+                            <p className="text-sm text-gray-500">See how your meals stack up today.</p>
+                        </div>
+                        <Button size="sm" className="text-white bg-primary hover:bg-primary/90 text-sm">
                             View Detailed Report
                         </Button>
-                    </CardTitle>
-                    <p className="text-sm text-secondary">See how your meals stack up today.</p>
+                    </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="space-y-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div className="lg:col-span-2 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
-                                    <p>Calories Consumed</p>
-                                    <p className="text-2xl font-medium">1,500</p>
-                                    <p className="text-sm">+200</p>
+                                <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
+                                    <p className="text-sm text-gray-500">Calories Consumed</p>
+                                    <p className="text-3xl font-bold text-gray-800">1,500</p>
+                                    <p className="text-xs text-green-500">+200</p>
                                 </Card>
-                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
-                                    <p>Proteins</p>
-                                    <p className="text-2xl font-medium">50g</p>
-                                    <p className="text-sm">+10g</p>
+                                <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
+                                    <p className="text-sm text-gray-500">Proteins</p>
+                                    <p className="text-3xl font-bold text-gray-800">50g</p>
+                                    <p className="text-xs text-green-500">+10g</p>
                                 </Card>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
-                                    <p>Carbohydrates</p>
-                                    <p className="text-2xl font-medium">290g</p>
-                                    <p className="text-sm">-5g</p>
+                                <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
+                                    <p className="text-sm text-gray-500">Carbohydrates</p>
+                                    <p className="text-3xl font-bold text-gray-800">290g</p>
+                                    <p className="text-xs text-red-500">-5g</p>
                                 </Card>
-                                <Card className="text-center gap-0 rounded-md shadow-none text-secondary">
-                                    <p>Fats</p>
-                                    <p className="text-2xl font-medium">30g</p>
-                                    <p className="text-sm">+5g</p>
+                                <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
+                                    <p className="text-sm text-gray-500">Fats</p>
+                                    <p className="text-3xl font-bold text-gray-800">30g</p>
+                                    <p className="text-xs text-green-500">+5g</p>
                                 </Card>
                             </div>
                         </div>
 
-                        <div className="lg:col-span-2 border p-5">
-                            <h3 className="text-sm font-semibold mb-2">Calorie Intake</h3>
-                            <Separator className="my-4" />
-                            <ChartContainer config={barChartConfig} className="h-[240px] w-full">
+                        <div className="lg:col-span-3 p-5 rounded-2xl bg-white border border-gray-100">
+                            <h3 className="text-base font-semibold mb-4 text-gray-800">Caloric Intake</h3>
+                            <ChartContainer config={barChartConfig} className="h-[200px] w-full">
                                 <BarChart accessibilityLayer data={dailyIntakeData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
                                     <ChartTooltip content={<ChartTooltipContent
                                         labelFormatter={(day) => `Hari ${day}`}
                                         nameFormatter={() => "Kalori"}
@@ -181,8 +225,10 @@ export default function NutritionView() {
             </Card>
 
             <div className="space-y-4 pt-4">
-                <h2 className="text-xl font-bold text-gray-800">Recommended Meals</h2>
-                <p className="text-sm text-gray-500">Specially curated according to your unique pregnancy needs.</p>
+                <h2 className="text-xl font-bold text-gray-800">History Meals</h2>
+                <p className="text-sm text-gray-500">
+                    Browse through various food, drinks, snacks, and supplements you have logged.
+                </p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     {productData.map((product, index) => (
@@ -191,9 +237,11 @@ export default function NutritionView() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Meals</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 **items-stretch**">
+                <div className="p-4 **h-full**">
+                    <h2 className="text-xl font-bold text-gray-800">Recent Meals</h2>
+                    <p className="text-sm text-gray-500 mb-4">View the meals you have consumed this week</p>
+
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button variant="outline" className="text-white bg-primary border-gray-400 hover:bg-primary/90 hover:text-white">
@@ -209,7 +257,7 @@ export default function NutritionView() {
                             </DialogHeader>
                             <div className="grid gap-4">
                                 <div className="grid gap-3">
-                                    <Label htmlFor="username-1">Category</Label>
+                                    <Label htmlFor="category">Category</Label>
                                     <Select>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select a category" />
@@ -233,40 +281,47 @@ export default function NutritionView() {
                                 <DialogClose asChild>
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
-                                <Button type="submit">Save changes</Button>
+                                <Button type="submit" className="bg-primary hover:bg-primary/90">Save changes</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <p className="text-sm text-gray-500 mt-2">View the meals you have consumed this week</p>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 border p-10 mt-2 rounded-2xl bg-white">
-                        {mealData.map((meal, index) => (
-                            <MealItem key={index} time={meal.time} calories={meal.calories} icon={meal.icon} />
-                        ))}
-                    </div>
+                    <FeaturedRecentMeal data={nasiGorengData} />
+
                 </div>
 
-                <div>
+                <div className="h-full space-y-4">
                     <h2 className="text-xl font-bold text-gray-800 mb-4">Caloric Intake Over the Week</h2>
-                    <ChartContainer config={lineChartConfig} className="h-[250px] w-full">
-                        <AreaChart accessibilityLayer data={weeklyCaloricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                            <Area
-                                dataKey="calories"
-                                type="monotone"
-                                stroke="var(--color-calories)"
-                                strokeWidth={3}
-                                fill="url(#colorCalories)"
-                            />
 
-                            <defs>
-                                <linearGradient id="colorCalories" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="var(--color-calories)" stopOpacity={0.8} />
-                                    <stop offset="95%" stopColor="var(--color-calories)" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                        </AreaChart>
-                    </ChartContainer>
+                    <Card className="shadow-none border-2 border-gray-100 p-6 rounded-2xl relative overflow-hidden">
+                        <h3 className="text-base font-bold text-gray-800 mb-4">Caloric Intake per Meal</h3>
+                        <div className="grid grid-cols-4 gap-4">
+                            {mealData.map((meal, index) => (
+                                <MealItem key={index} time={meal.time} calories={meal.calories} icon={meal.icon} />
+                            ))}
+                        </div>
+                    </Card>
+                    <Card className="p-4 rounded-2xl shadow-lg border-none h-full">
+                        <ChartContainer config={lineChartConfig} className="h-full w-full">
+                            <AreaChart accessibilityLayer data={weeklyCaloricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <Area
+                                    dataKey="calories"
+                                    type="monotone"
+                                    stroke="#FF90A7"
+                                    strokeWidth={3}
+                                    fill="url(#colorCalories)"
+                                />
+
+                                <defs>
+                                    <linearGradient id="colorCalories" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#FF90A7" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#FF90A7" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                            </AreaChart>
+                        </ChartContainer>
+                    </Card>
                 </div>
             </div>
         </div>

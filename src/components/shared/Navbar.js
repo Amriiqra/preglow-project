@@ -82,13 +82,13 @@ export default function Navbar() {
                     ))}
                 </ul>
 
-                {/* <Button
+                <Button
                     className="rounded-full bg-secondary hover:bg-secondary/90 text-white w-32 hidden md:block"
                     onClick={() => router.push("/login")}
                 >
                     Login
-                </Button> */}
-                <Popover>
+                </Button>
+                {/* <Popover>
                     <PopoverTrigger asChild>
                         <div className="lg:flex items-center gap-2 cursor-pointer hidden">
                             <Avatar className="w-10 h-10">
@@ -134,7 +134,7 @@ export default function Navbar() {
                             </div>
                         </div>
                     </PopoverContent>
-                </Popover>
+                </Popover> */}
             </div>
 
             {isMenuOpen && (
@@ -150,16 +150,16 @@ export default function Navbar() {
                                 {item.name}
                             </li>
                         ))}
-                        {/* <div className="pt-2">
+                        <div className="pt-2">
                             <Button
                                 className="rounded-full bg-secondary hover:bg-primary text-white w-full"
                                 onClick={() => router.push("/login")}
                             >
                                 Login
                             </Button>
-                        </div> */}
+                        </div>
                     </ul>
-                    <Separator className="mt-2" />
+                    {/* <Separator className="mt-2" />
                     <div className="grid gap-4 mt-4">
                         <div className="flex items-center gap-2 cursor-pointer">
                             <Avatar className="w-8 h-8">
@@ -201,7 +201,7 @@ export default function Navbar() {
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
-                    </div>
+                    </div> */}
                 </div>
             )}
         </nav>
