@@ -225,12 +225,12 @@ export default function DashboardDefault() {
                   </Card>
                 </div>
               </div>
-              <div className="flex items-end justify-end h-3/4">
+              {/* <div className="flex items-end justify-end h-3/4">
                 <Link href={"/nutrition"} className="flex items-center gap-2 text-sm p-0 h-auto text-secondary">
                   Explore More Healthy Foods
                   <ArrowRight size={16} />
                 </Link>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </div>
