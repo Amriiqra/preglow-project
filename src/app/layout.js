@@ -1,5 +1,6 @@
 import { Figtree, Kaisei_Decol } from "next/font/google";
 import "./globals.css";
+import { Analytics } from '@vercel/analytics/next';
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
         className={`${figtree.variable} ${kaisei.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
