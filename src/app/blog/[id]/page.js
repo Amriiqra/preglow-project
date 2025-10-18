@@ -1,5 +1,5 @@
 // PROJECT IMPORTS
-import DetailBlog from "../../../../sections/landing/DetailBlog";
+import DetailBlog from "../../../sections/landing/DetailBlog";
 
 // ==============================|| Detail Blog ||============================== //
 

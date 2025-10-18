@@ -1,6 +1,7 @@
 import { Figtree, Kaisei_Decol } from "next/font/google";
 import "./globals.css";
 import { Analytics } from '@vercel/analytics/next';
+import { Toaster } from "@/components/ui/sonner";
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
       >
         {children}
         <Analytics />
+        <Toaster />
       </body>
     </html>
   );

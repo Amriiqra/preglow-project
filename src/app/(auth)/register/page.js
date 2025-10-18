@@ -1,124 +1,15 @@
-"use client"
+// PROJECT IMPORTS
+import RegisterView from "@/views/auth/register/RegisterView";
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Eye, EyeOff } from 'lucide-react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+// ==============================|| Sign Up ||============================== //
 
-export default function Register() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+export const metadata = {
+    title: "Sign Up",
+    description: "Sign Up",
+};
 
-    return (
-        <div className="min-h-screen relative overflow-hidden pt-12">
-            <div className="absolute inset-0">
-                <Image
-                    src="/assets/images/background_login.png"
-                    alt='background_login'
-                    width={600}
-                    height={600}
-                    className='w-full'
-                />
-            </div>
+const SignUp = () => {
+    return <RegisterView />;
+};
 
-            <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] px-4 pt-12">
-                <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/95 backdrop-blur-sm rounded-none">
-                    <CardContent className="p-8 md:p-10">
-                        <h1 className="text-4xl font-bold text-gray-800 mb-8">Sign Up</h1>
-
-                        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                            <div className='grid grid-cols-2 gap-3'>
-                                <div className="space-y-2">
-                                    <Label htmlFor="username" className="text-sm font-medium text-gray-700">
-                                        Username
-                                    </Label>
-                                    <Input
-                                        id="username"
-                                        type="text"
-                                        placeholder="Enter Username"
-                                        // value={email}
-                                        // onChange={(e) => setEmail(e.target.value)}
-                                        className="h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="pregnancy-date" className="text-sm font-medium text-gray-700">
-                                        Pregnancy date
-                                    </Label>
-                                    <Input
-                                        id="pregnancy-date"
-                                        type="date"
-                                        placeholder="Enter Pregnancy Date"
-                                        // value={email}
-                                        // onChange={(e) => setEmail(e.target.value)}
-                                        className="h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                    E-mail address
-                                </Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Enter Email"
-                                    // value={email}
-                                    // onChange={(e) => setEmail(e.target.value)}
-                                    className="h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                                    Password
-                                </Label>
-                                <div className="relative">
-                                    <Input
-                                        id="password"
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Enter Password"
-                                        // value={password}
-                                        // onChange={(e) => setPassword(e.target.value)}
-                                        className="h-12 px-4 pr-12 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="w-5 h-5" />
-                                        ) : (
-                                            <Eye className="w-5 h-5" />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="w-full h-12 bg-secondary hover:bg-secondary/90 text-white font-medium text-lg rounded-full"
-                            >
-                                Sign Up
-                            </Button>
-
-                            <p className="text-center text-sm text-gray-600 mt-4">
-                                Have an account?{' '}
-                                <Link href="/login" className="text-pink-500 hover:text-pink-600 font-semibold">
-                                    Log In
-                                </Link>
-                            </p>
-                        </form>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    );
-}
+export default SignUp;

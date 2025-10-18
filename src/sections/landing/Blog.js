@@ -1,11 +1,30 @@
+"use client";
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import * as API from "@/core/services/api";
+import useSWR from 'swr'
+import { toast } from 'sonner';
 
 export default function Blog() {
+
+    const { data } = useSWR(
+        'landingArticles',
+        async () => {
+            const response = await API.Landing.getArticles();
+            return response.data;
+        },
+        {
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+            onError: (error) => {
+                toast.error(`Failed to load data!\n${error.message}`);
+            },
+        }
+    );
     return (
         <section id="blog" className="py-20 bg-gray-50">
             <div className="container mx-auto px-6 max-w-7xl">
@@ -16,7 +35,7 @@ export default function Blog() {
                     <Separator className="border-2 border-secondary mb-16 mt-3" />
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
-                    {[1, 2, 3, 4, 5, 6].map((item) => (
+                    {data?.map((item) => (
                         <Card key={item} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden p-0 gap-0">
                             <Image
                                 src="/assets/images/image_blog.jpg"
