@@ -16,7 +16,7 @@ export default function Header() {
         <div className="grid md:grid-cols-2 lg:gap-12 gap-5 items-center">
           <div className="text-white pb-8 md:pb-16 text-center md:text-left">
             <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6 leading-tight">
-              Your Companion for Every Step of Motherhood
+              Your Companion for Every Step of Motherhood adasdasdasd
             </h1>
             <p className="text-md sm:text-lg mb-8 text-pink-50 max-w-lg mx-auto md:mx-0">
               Navigate pregnancy with confidence. Track your baby's growth, connect with a supportive community, and find trusted answers, all in one place.
