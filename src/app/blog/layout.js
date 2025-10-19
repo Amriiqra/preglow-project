@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function Layout({ children }) {
     return <div>
-        <Navbar />
+        <Navbar sectionId="blog" />
         {children}
     </div>;
 }

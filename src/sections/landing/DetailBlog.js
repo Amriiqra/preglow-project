@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArticleSkeleton } from "@/components/shared/skeleton/SkeletonDetailBlog";
+import Footer from "./Footer";
 
 const RelatedArticleCard = ({ title, image, id }) => (
     <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
@@ -95,53 +96,56 @@ export default function DetailBlog() {
     }
 
     return (
-        <div className="bg-white min-h-screen">
-            <div className="h-[80px]" />
+        <>
+            <div className="bg-white min-h-screen" id="blog">
+                <div className="h-[80px]" />
 
-            <div className="container mx-auto px-6 max-w-4xl py-12">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-8 text-center">
-                    {articleData?.title}
-                </h1>
+                <div className="container mx-auto px-6 max-w-4xl py-12">
+                    <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-8 text-center">
+                        {articleData?.title}
+                    </h1>
 
-                <Card className="shadow-lg border-none mb-12">
-                    <CardContent className="p-0">
-                        <div className="relative w-full h-80 sm:h-96">
-                            <Image
-                                src={articleData?.photo}
-                                alt={articleData?.title || "Article image"}
-                                fill
-                                className="object-cover rounded-t-lg"
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
+                    <Card className="shadow-lg border-none mb-12">
+                        <CardContent className="p-0">
+                            <div className="relative w-full h-80 sm:h-96">
+                                <Image
+                                    src={articleData?.photo}
+                                    alt={articleData?.title || "Article image"}
+                                    fill
+                                    className="object-cover rounded-t-lg"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                <div className="text-lg leading-relaxed text-gray-700 space-y-6 text-justify">
-                    {renderArticleContent(articleData?.content)}
-                </div>
-            </div>
-
-            <div className="container mx-auto px-6 max-w-7xl py-12">
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800">
-                            Read Our Latest Articles
-                        </h2>
-                        <Separator className="border-2 border-secondary mt-3 mb-0" />
+                    <div className="text-lg leading-relaxed text-gray-700 space-y-6 text-justify">
+                        {renderArticleContent(articleData?.content)}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {otherArticleData?.data?.map((article, index) => (
-                        <RelatedArticleCard
-                            key={index}
-                            title={article?.title}
-                            image={article?.photo}
-                            id={article?._id}
-                        />
-                    ))}
+                <div className="container mx-auto px-6 max-w-7xl py-12">
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-800">
+                                Read Our Latest Articles
+                            </h2>
+                            <Separator className="border-2 border-secondary mt-3 mb-0" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {otherArticleData?.data?.map((article, index) => (
+                            <RelatedArticleCard
+                                key={index}
+                                title={article?.title}
+                                image={article?.photo}
+                                id={article?._id}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+            <Footer />
+        </>
     );
 }

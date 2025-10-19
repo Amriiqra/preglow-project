@@ -25,7 +25,7 @@ const ProfileSkeleton = () => (
 );
 
 
-export default function Navbar() {
+export default function Navbar({ sectionId }) {
     const router = useRouter();
     const pathname = usePathname();
     const [isClient, setIsClient] = useState(false);
@@ -49,12 +49,17 @@ export default function Navbar() {
 
     const scrollToSection = (id) => {
         const element = document.getElementById(id);
-        if (element) {
-            window.scrollTo({
-                top: element.offsetTop - 80,
-                behavior: 'smooth'
-            });
-            setActiveSection(id);
+        if (pathname === '/') {
+            if (element) {
+                window.scrollTo({
+                    top: element.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+                setActiveSection(id);
+                setIsMenuOpen(false);
+            }
+        } else {
+            router.push(`/#${id}`);
             setIsMenuOpen(false);
         }
     };
@@ -63,7 +68,7 @@ export default function Navbar() {
         if (!isClient || pathname !== "/") return;
 
         const handleScroll = () => {
-            let current = "header";
+            let current = sectionId || "header";
             navItems.forEach((item) => {
                 const section = document.getElementById(item.id);
                 if (section && window.scrollY >= section.offsetTop - 150) {
@@ -141,19 +146,25 @@ export default function Navbar() {
                 </button>
 
                 <ul className="hidden md:flex items-center gap-10">
-                    {navItems.map((item) => (
-                        <li
-                            key={item.id}
-                            onClick={() => scrollToSection(item.id)}
-                            className={`cursor-pointer relative pb-1 transition-colors text-gray-700 hover:text-secondary 
-                                ${activeSection === item.id ? 'text-secondary font-semibold' : ''}`}
-                        >
-                            {item.name}
-                            {activeSection === item.id && (
-                                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-secondary rounded-full" />
-                            )}
-                        </li>
-                    ))}
+                    {navItems.map((item) => {
+                        const isActive = sectionId
+                            ? item.id === sectionId
+                            : item.id === activeSection;
+
+                        return (
+                            <li
+                                key={item.id}
+                                onClick={() => scrollToSection(item.id)}
+                                className={`cursor-pointer relative pb-1 transition-colors text-gray-700 hover:text-secondary 
+                                    ${isActive ? 'text-secondary font-semibold' : ''}`}
+                            >
+                                {item.name}
+                                {isActive && (
+                                    <div className="absolute bottom-0 left-0 w-full h-[2px] bg-secondary rounded-full" />
+                                )}
+                            </li>
+                        );
+                    })}
                 </ul>
 
                 {token ? (
@@ -162,9 +173,10 @@ export default function Navbar() {
                             <div className="lg:flex items-center gap-2 cursor-pointer hidden">
                                 <Avatar className="w-10 h-10">
                                     <AvatarImage src="/assets/photoProfile.jpg" alt="Profile Picture" />
-                                    <AvatarFallback>                                                                            {profile?.username
-                                        ? profile.username.trim().slice(0, 2).toUpperCase()
-                                        : ''}
+                                    <AvatarFallback>
+                                        {profile?.username
+                                            ? profile.username.trim().slice(0, 2).toUpperCase()
+                                            : ''}
                                     </AvatarFallback>
                                 </Avatar>
                                 <span className="capitalize">{profile?.username}</span>
@@ -195,7 +207,9 @@ export default function Navbar() {
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <DialogFooter>
-                                                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                                                <Button variant="outline"
+                                                    onClick={() =>
+                                                        setIsDialogOpen(false)}>Cancel</Button>
 
                                                 <Button onClick={formik.handleSubmit} disabled={formik.isSubmitting}>
                                                     {formik.isSubmitting ? 'Logging out...' : 'Log Out'}
@@ -220,16 +234,23 @@ export default function Navbar() {
             {isMenuOpen && (
                 <div className="md:hidden bg-white shadow-lg pb-4 px-4">
                     <ul className="flex flex-col gap-3 py-2">
-                        {navItems.map((item) => (
-                            <li
-                                key={item.id}
-                                onClick={() => scrollToSection(item.id)}
-                                className={`cursor-pointer p-2 rounded-md transition-colors 
-                                    ${activeSection === item.id ? 'bg-secondary/10 text-secondary font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
-                            >
-                                {item.name}
-                            </li>
-                        ))}
+                        {navItems.map((item) => {
+                            const isActive = sectionId
+                                ? item.id === sectionId
+                                : item.id === activeSection;
+
+                            return (
+                                <li
+                                    key={item.id}
+                                    onClick={() => scrollToSection(item.id)}
+                                    className={`cursor-pointer p-2 rounded-md transition-colors 
+                                        ${isActive ? 'bg-secondary/10 text-secondary font-semibold' :
+                                            'text-gray-700 hover:bg gray-100'}`}
+                                >
+                                    {item.name}
+                                </li>
+                            );
+                        })}
                     </ul>
                     <Separator className="mt-2" />
                     {token ? (
@@ -237,9 +258,8 @@ export default function Navbar() {
                             <div className="flex items-center gap-2 cursor-pointer">
                                 <Avatar className="w-8 h-8">
                                     <AvatarImage src="/assets/photoProfile.jpg" alt="Profile Picture" />
-                                    <AvatarFallback>                                                                            {profile?.username
-                                        ? profile.username.trim().slice(0, 2).toUpperCase()
-                                        : ''}
+                                    <AvatarFallback>
+                                        {profile?.username.trim().slice(0, 2).toUpperCase()}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex items-start flex-col">
