@@ -1,60 +1,86 @@
-// api/axiosConfig.js
+import { baseUrl } from '@/config/global';
+import axios from 'axios';
+import { TokenManager } from '@/utils/tokenManager';
 
-import { baseUrl } from "@/config/global";
-import axios from "axios";
-
-export const INTERCEPTOR_CONFIG = {
-  REQUEST_TIMEOUT: 1 * 60 * 1000,
-  DEBUG_MODE: false,
-};
-
-function onResponse(response) {
-  if (INTERCEPTOR_CONFIG.DEBUG_MODE) {
-    const duration = Date.now() - (response.config._requestStartTime || 0);
-    console.log(`✅ Response received in ${duration}ms: ${response.config.url}`);
-  }
-  return response;
-}
-
-function onResponseError(error) {
-  if (INTERCEPTOR_CONFIG.DEBUG_MODE) {
-    console.error("❌ Request Failed:", error.response || error.message);
-  }
-  return Promise.reject(error);
-}
-
-
-function setupInterceptorsTo(instance) {
-  instance.interceptors.request.use((config) => {
-    config._requestStartTime = Date.now();
-    return config;
-  }, (error) => {
-    return Promise.reject(error);
-  });
-
-  instance.interceptors.response.use(
-    onResponse,
-    onResponseError
-  );
-}
-
+/**
+ * @function createAxiosInstance
+ * @description Creates axios instance with automatic token validation
+ * @returns {AxiosInstance} 
+ */
 export const createAxiosInstance = () => {
-  const instance = axios.create({
-    baseURL: baseUrl,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    timeout: INTERCEPTOR_CONFIG.REQUEST_TIMEOUT,
-  });
+    const instance = axios.create({
+        baseURL: baseUrl,
+        timeout: 10000,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
 
-  setupInterceptorsTo(instance);
+    instance.interceptors.request.use(
+        (config) => {
+            if (typeof window !== 'undefined') {
+                try {
+                    const token = TokenManager.getToken();
 
-  return instance;
+                    if (token) {
+                        config.headers['Authorization'] = `Bearer ${token}`;
+
+                        const remainingDays = TokenManager.getRemainingDays();
+                        console.log(`⏰ Token expires in ${remainingDays} days`);
+                    } else {
+                        console.warn('⚠️ No valid token found');
+                    }
+                } catch (error) {
+                    console.error('❌ Error reading token:', error);
+                }
+            } else {
+                console.log('🖥️ Running on server-side, skipping token');
+            }
+
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
+        }
+    );
+
+    // Response interceptor to handle 401 Unauthorized
+    instance.interceptors.response.use(
+        (response) => response,
+        (error) => {
+            if (error.response?.status === 401) {
+                console.warn('⚠️ 401 Unauthorized - Token may be invalid or expired');
+                TokenManager.removeToken();
+
+                if (typeof window !== 'undefined') {
+                    window.location.href = '/login';
+                }
+            }
+            return Promise.reject(error);
+        }
+    );
+
+    return instance;
 };
 
-export const createHandleRequest = () => (request) =>
-  new Promise((resolve, reject) => {
-    request
-      .then((res) => resolve(res.data))
-      .catch((err) => reject(err));
-  });
+/**
+ * @function createHandleRequest
+ * @description Handle API requests with proper error handling
+ */
+export const createHandleRequest = () => {
+    return async (promise) => {
+        try {
+            const response = await promise;
+            return response.data;
+        } catch (error) {
+            console.error("API Request Failed:", error);
+
+            const errorMessage =
+                error.response?.data?.message ||
+                error.message ||
+                "Terjadi kesalahan yang tidak diketahui.";
+
+            throw new Error(errorMessage);
+        }
+    };
+};

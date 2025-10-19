@@ -19,12 +19,13 @@ const Toaster = ({
     <Sonner
       theme={theme}
       className="toaster group"
+      position="top-right"
       icons={{
-        success: <CircleCheckIcon className="size-4" />,
-        info: <InfoIcon className="size-4" />,
-        warning: <TriangleAlertIcon className="size-4" />,
-        error: <OctagonXIcon className="size-4" />,
-        loading: <Loader2Icon className="size-4 animate-spin" />,
+        success: <CircleCheckIcon className="size-4 text-green-500" />,
+        info: <InfoIcon className="size-4 text-blue-500" />,
+        warning: <TriangleAlertIcon className="size-4 text-yellow-500" />,
+        error: <OctagonXIcon className="size-4 text-red-500" />,
+        loading: <Loader2Icon className="size-4 animate-spin text-gray-500" />,
       }}
       style={
         {

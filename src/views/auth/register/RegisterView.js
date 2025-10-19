@@ -5,17 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff } from 'lucide-react';
+import { ChevronDownIcon, Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useFormik } from 'formik';
 import { toast } from 'sonner';
 import { initialValues, validationSchema } from './ValidationSchema';
 import * as API from "@/core/services/api";
+import { useRouter } from 'next/navigation';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 
 
 export default function RegisterView() {
     const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
+    const [open, setOpen] = React.useState(false);
 
     const formik = useFormik({
         initialValues,
@@ -23,12 +28,29 @@ export default function RegisterView() {
         onSubmit: async (values, { setSubmitting }) => {
             setSubmitting(true);
             try {
-                toast.promise(API.User.register(values), {
-                    loading: "Menyimpan data pengguna...",
-                    success: "Data pengguna berhasil disimpan",
-                    error: (err) => `Gagal menyimpan data!\n${err.message}`,
+                const formattedValues = {
+                    ...values,
+                    pregnancyDate: values.pregnancyDate
+                        ? new Date(values.pregnancyDate).toLocaleDateString('en-GB')
+                        : ''
+                };
+
+                const registerPromise = API.User.register(formattedValues);
+
+                toast.promise(registerPromise, {
+                    loading: "Saving user data...",
+                    success: (data) => {
+                        return data.message || "Registration successful!";
+                    },
+                    error: (err) => {
+                        return `Failed to save data! ${err.message || "Please try again."}`;
+                    },
                 });
-                router.push("/otp");
+                await registerPromise;
+                router.push(`/otp?email=${values.email}`);
+
+            } catch (error) {
+                console.error("Registration process failed:", error);
             } finally {
                 setSubmitting(false);
             }
@@ -47,7 +69,7 @@ export default function RegisterView() {
                     alt='background_login'
                     width={1200}
                     height={1200}
-                    className='w-full'
+                    className='w-full h-full object-cover'
                 />
             </div>
 
@@ -67,7 +89,7 @@ export default function RegisterView() {
                                         type="text"
                                         placeholder="Enter Username"
                                         {...formik.getFieldProps('username')}
-                                        className={`h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400
+                                        className={`h-12 px-4 bg-white border-gray-200 focus:border-pink-400 focus:ring-pink-400
                                             ${getError('username') ? 'border-red-500' : ''}`}
                                     />
                                     {getError('username') && (
@@ -79,14 +101,36 @@ export default function RegisterView() {
                                     <Label htmlFor="pregnancyDate" className="text-sm font-medium text-gray-700">
                                         Pregnancy date
                                     </Label>
-                                    <Input
-                                        id="pregnancyDate"
-                                        type="date"
-                                        placeholder="Enter Pregnancy Date"
-                                        {...formik.getFieldProps('pregnancyDate')}
-                                        className={`h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400
-                                            ${getError('pregnancyDate') ? 'border-red-500' : ''}`}
-                                    />
+                                    <Popover open={open} onOpenChange={setOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                id="pregnancyDate"
+                                                type="button"
+                                                className={`w-full h-12 justify-between font-normal ${getError('pregnancyDate') ? 'border-red-500' : ''}`}
+                                            >
+                                                {formik.values.pregnancyDate
+                                                    ? new Date(formik.values.pregnancyDate).toLocaleDateString('en-GB')
+                                                    : "Select date"}
+                                                <ChevronDownIcon />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={formik.values.pregnancyDate ? new Date(formik.values.pregnancyDate) : undefined}
+                                                captionLayout="dropdown"
+                                                onSelect={(selectedDate) => {
+                                                    formik.setFieldValue('pregnancyDate', selectedDate || '');
+                                                    formik.setFieldTouched('pregnancyDate', true);
+                                                    setOpen(false);
+                                                }}
+                                                disabled={(date) => date > new Date()}
+                                                fromYear={1900}
+                                                toYear={new Date().getFullYear()}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                     {getError('pregnancyDate') && (
                                         <div className="text-red-500 text-xs mt-1">{formik.errors.pregnancyDate}</div>
                                     )}
@@ -102,7 +146,7 @@ export default function RegisterView() {
                                     type="email"
                                     placeholder="Enter Email"
                                     {...formik.getFieldProps('email')}
-                                    className={`h-12 px-4 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400
+                                    className={`h-12 px-4 bg-white border-gray-200 focus:border-pink-400 focus:ring-pink-400
                                         ${getError('email') ? 'border-red-500' : ''}`}
                                 />
                                 {getError('email') && (
@@ -120,7 +164,7 @@ export default function RegisterView() {
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Enter Password"
                                         {...formik.getFieldProps('password')}
-                                        className={`h-12 px-4 pr-12 bg-gray-50 border-gray-200 focus:border-pink-400 focus:ring-pink-400
+                                        className={`h-12 px-4 pr-12 bg-white border-gray-200 focus:border-pink-400 focus:ring-pink-400
                                             ${getError('password') ? 'border-red-500' : ''}`}
                                     />
                                     <button
@@ -145,7 +189,7 @@ export default function RegisterView() {
                                 disabled={formik.isSubmitting || !formik.isValid}
                                 className="w-full h-12 bg-secondary hover:bg-secondary/90 text-white font-medium text-lg rounded-full"
                             >
-                                {formik.isSubmitting ? 'Mendaftar...' : 'Sign Up'}
+                                {formik.isSubmitting ? 'Signing up...' : 'Sign Up'}
                             </Button>
 
                             <p className="text-center text-sm text-gray-600 mt-4">

@@ -14,16 +14,67 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
+import useSWR from 'swr';
+import * as API from "@/core/services/api";
+import { useFormik } from 'formik'
+import { toast } from 'sonner';
+import { TokenManager } from '@/utils/tokenManager'
 
 export default function NavFooter() {
     const router = useRouter();
 
-    const handleLogout = () => {
-        router.push('/');
+    const {
+        data: profile,
+        isLoading
+    } = useSWR('userProfile', API.User.getProfile);
+
+    const formik = useFormik({
+        initialValues: {},
+        onSubmit: async (values, { setSubmitting }) => {
+            setSubmitting(true);
+            try {
+                const logoutPromise = API.User.logout();
+
+                toast.promise(logoutPromise, {
+                    loading: "Logging out...",
+                    success: (data) => {
+                        TokenManager.removeToken();
+                        return data.message || "Logout successful!";
+                    },
+                    error: (err) => {
+                        return `Failed to log out! ${err.message || "Please try again."}`;
+                    },
+                });
+
+                await logoutPromise;
+
+                router.push('/');
+                router.refresh();
+
+            } catch (error) {
+                console.error("Logout process failed:", error);
+            } finally {
+                setSubmitting(false);
+            }
+        },
+    });
+
+    if (isLoading) {
+        return (
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <div className="flex items-center p-3 w-full bg-[#F2F2F2] rounded-2xl animate-pulse">
+                        <div className="w-10 h-10 rounded-full bg-gray-300 mr-4"></div>
+                        <div className="flex flex-col items-start justify-start space-y-1">
+                            <div className="w-20 h-4 bg-gray-300 rounded"></div>
+                            <div className="w-32 h-3 bg-gray-300 rounded"></div>
+                        </div>
+                    </div>
+                </SidebarMenuItem>
+            </SidebarMenu>
+        );
     }
 
     return (
@@ -34,14 +85,14 @@ export default function NavFooter() {
                         <SidebarMenuButton className="bg-[#F2F2F2] rounded-2xl">
                             <Avatar>
                                 <AvatarImage
-                                    src="https://github.com/evilrabbit.png"
-                                    alt="@evilrabbit"
+                                    src="/assets/photoProfile.jpg"
+                                    alt="photo profile"
                                 />
                                 <AvatarFallback>ER</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col items-start justify-start">
-                                <span className="text-secondary font-semibold">Username</span>
-                                <p className="text-muted-foreground">28 week Pregnant</p>
+                                <span className="text-secondary font-semibold capitalize">{profile?.username}</span>
+                                <p className="text-muted-foreground">{profile?.pregnancy_weeks} week Pregnant</p>
                             </div>
                             <EllipsisVertical className="ml-auto" />
                         </SidebarMenuButton>
@@ -51,14 +102,14 @@ export default function NavFooter() {
                             <div className="flex items-center gap-5">
                                 <Avatar>
                                     <AvatarImage
-                                        src="https://github.com/evilrabbit.png"
-                                        alt="@evilrabbit"
+                                        src="/assets/photoProfile.jpg"
+                                        alt="photo profile"
                                     />
                                     <AvatarFallback>ER</AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col items-start justify-start">
-                                    <span className="text-secondary font-semibold">Username</span>
-                                    <p className="text-muted-foregrounde text-sm">28 week Pregnant</p>
+                                    <span className="text-secondary font-semibold capitalize">{profile?.username}</span>
+                                    <p className="text-muted-foreground text-sm">{profile?.pregnancy_weeks} week Pregnant</p>
                                 </div>
                             </div>
                             <Separator />
@@ -111,7 +162,12 @@ export default function NavFooter() {
                                             <DialogClose asChild>
                                                 <Button variant="outline">Cancel</Button>
                                             </DialogClose>
-                                            <Button onClick={handleLogout}>Log Out</Button>
+                                            <Button
+                                                onClick={formik.handleSubmit}
+                                                disabled={formik.isSubmitting}
+                                            >
+                                                {formik.isSubmitting ? 'Logging out...' : 'Log Out'}
+                                            </Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
