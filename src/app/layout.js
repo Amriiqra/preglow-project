@@ -2,6 +2,8 @@ import { Figtree, Kaisei_Decol } from "next/font/google";
 import "./globals.css";
 import { Analytics } from '@vercel/analytics/next';
 import { Toaster } from "@/components/ui/sonner";
+import { Suspense } from "react";
+import Loader from "@/components/shared/Loader";
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -26,7 +28,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${figtree.variable} ${kaisei.variable} antialiased`}
       >
-        {children}
+        <Suspense fallback={<Loader />}>
+          {children}
+        </Suspense>
         <Analytics />
         <Toaster />
       </body>
