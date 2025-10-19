@@ -8,24 +8,7 @@ import Link from 'next/link';
 import * as API from "@/core/services/api";
 import useSWR from 'swr';
 import { toast } from 'sonner';
-import { Skeleton } from '@/components/ui/skeleton'; 
-
-const ArticleCardSkeleton = () => (
-    <Card className="border-0 shadow-lg overflow-hidden p-0 gap-0">
-        <Skeleton className="w-full h-72 rounded-t-lg" />
-        <CardContent className="p-4">
-            <Skeleton className="h-6 w-3/4 mb-3" />
-
-            <div className="space-y-2 mb-4">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-11/12" />
-                <Skeleton className="h-4 w-10/12" />
-            </div>
-
-            <Skeleton className="h-10 w-full rounded-lg" />
-        </CardContent>
-    </Card>
-);
+import { ArticleCardSkeleton } from '@/components/shared/skeleton/SkeletonBlog';
 
 export default function Blog() {
 
@@ -44,11 +27,9 @@ export default function Blog() {
         }
     );
 
-    const skeletonCount = 3;
-
     const renderContent = () => {
         if (isLoading) {
-            return Array.from({ length: skeletonCount }).map((_, index) => (
+            return Array.from({ length: 3 }).map((_, index) => (
                 <ArticleCardSkeleton key={index} />
             ));
         }
@@ -60,7 +41,7 @@ export default function Blog() {
         return data.map((item, index) => (
             <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden p-0 gap-0">
                 <Image
-                    src="/assets/images/image_blog.jpg"
+                    src={item.photo}
                     alt='image blog'
                     width={600}
                     height={400}

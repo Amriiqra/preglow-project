@@ -3,7 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 import { CircleUser, EllipsisVertical, LogOut } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Dialog,
     DialogClose,
@@ -21,16 +21,19 @@ import * as API from "@/core/services/api";
 import { useFormik } from 'formik'
 import { toast } from 'sonner';
 import { TokenManager } from '@/utils/tokenManager'
+import SkeletonNavFooter from '../skeleton/SkeletonNavFooter'
 
 export default function NavFooter() {
     const router = useRouter();
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
 
     const {
         data: profile,
-        isLoading
+        isLoading,
+        mutate
     } = useSWR('userProfile', API.User.getProfile);
 
-    const formik = useFormik({
+    const logoutFormik = useFormik({
         initialValues: {},
         onSubmit: async (values, { setSubmitting }) => {
             setSubmitting(true);
@@ -49,7 +52,6 @@ export default function NavFooter() {
                 });
 
                 await logoutPromise;
-
                 router.push('/');
                 router.refresh();
 
@@ -61,20 +63,44 @@ export default function NavFooter() {
         },
     });
 
+    const updateStatusFormik = useFormik({
+        initialValues: {
+            status: '',
+        },
+        onSubmit: async (values, { setSubmitting }) => {
+            setSubmitting(true);
+            try {
+                const updatePromise = API.User.updateStatusUser(values);
+
+                toast.promise(updatePromise, {
+                    loading: "Updating pregnancy status...",
+                    success: (data) => {
+                        mutate();
+                        setOpenUpdateDialog(false);
+                        return data.message || "Status updated successfully!";
+                    },
+                    error: (err) => {
+                        return `Failed to update status! ${err.message || "Please try again."}`;
+                    },
+                });
+
+                await updatePromise;
+
+            } catch (error) {
+                console.error("Update status failed:", error);
+            } finally {
+                setSubmitting(false);
+            }
+        },
+    });
+
+    const handleStatusUpdate = (status) => {
+        updateStatusFormik.setFieldValue('status', status);
+        updateStatusFormik.handleSubmit();
+    };
+
     if (isLoading) {
-        return (
-            <SidebarMenu>
-                <SidebarMenuItem>
-                    <div className="flex items-center p-3 w-full bg-[#F2F2F2] rounded-2xl animate-pulse">
-                        <div className="w-10 h-10 rounded-full bg-gray-300 mr-4"></div>
-                        <div className="flex flex-col items-start justify-start space-y-1">
-                            <div className="w-20 h-4 bg-gray-300 rounded"></div>
-                            <div className="w-32 h-3 bg-gray-300 rounded"></div>
-                        </div>
-                    </div>
-                </SidebarMenuItem>
-            </SidebarMenu>
-        );
+        return <SkeletonNavFooter />;
     }
 
     return (
@@ -88,11 +114,17 @@ export default function NavFooter() {
                                     src="/assets/photoProfile.jpg"
                                     alt="photo profile"
                                 />
-                                <AvatarFallback>ER</AvatarFallback>
+                                <AvatarFallback>
+                                    {profile?.username.trim().slice(0, 2).toUpperCase()}
+                                </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col items-start justify-start">
                                 <span className="text-secondary font-semibold capitalize">{profile?.username}</span>
-                                <p className="text-muted-foreground">{profile?.pregnancy_weeks} week Pregnant</p>
+                                {profile.status === 'Pregnant' ? (
+                                    <p className="text-muted-foreground">{profile?.pregnancy_weeks} week Pregnant</p>
+                                ) : (
+                                    <p className="text-muted-foreground">{profile?.status}</p>
+                                )}
                             </div>
                             <EllipsisVertical className="ml-auto" />
                         </SidebarMenuButton>
@@ -105,16 +137,22 @@ export default function NavFooter() {
                                         src="/assets/photoProfile.jpg"
                                         alt="photo profile"
                                     />
-                                    <AvatarFallback>ER</AvatarFallback>
+                                    <AvatarFallback>
+                                        {profile?.username.trim().slice(0, 2).toUpperCase()}
+                                    </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col items-start justify-start">
                                     <span className="text-secondary font-semibold capitalize">{profile?.username}</span>
-                                    <p className="text-muted-foreground text-sm">{profile?.pregnancy_weeks} week Pregnant</p>
+                                    {profile.status === 'Pregnant' ? (
+                                        <p className="text-muted-foreground">{profile?.pregnancy_weeks} week Pregnant</p>
+                                    ) : (
+                                        <p className="text-muted-foreground">{profile?.status}</p>
+                                    )}
                                 </div>
                             </div>
                             <Separator />
                             <div className="grid gap-2">
-                                <Dialog>
+                                <Dialog open={openUpdateDialog} onOpenChange={setOpenUpdateDialog}>
                                     <DialogTrigger asChild>
                                         <div className="flex items-center gap-2 cursor-pointer">
                                             <CircleUser color="#828282" />
@@ -123,23 +161,43 @@ export default function NavFooter() {
                                     </DialogTrigger>
                                     <DialogContent className="sm:max-w-[425px]">
                                         <DialogHeader>
-                                            <DialogTitle>Update Pregnancy</DialogTitle>
+                                            <DialogTitle>Update Pregnancy Status</DialogTitle>
                                             <DialogDescription>
-                                                Fill in the details below to update your pregnancy information.
+                                                Select your current pregnancy status below.
                                             </DialogDescription>
                                         </DialogHeader>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="grid gap-3">
-                                                <Button type="submit">Pregnant</Button>
-                                            </div>
-                                            <div className="grid gap-3">
-                                                <Button variant="outline">Has Been Born</Button>
-                                            </div>
+                                        <div className={`grid gap-4 ${profile?.status === 'Pregnant' || profile?.status === 'Born' ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                                            {profile?.status !== 'Pregnant' && (
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => handleStatusUpdate('Pregnant')}
+                                                    disabled={updateStatusFormik.isSubmitting}
+                                                    className="w-full"
+                                                >
+                                                    {updateStatusFormik.isSubmitting && updateStatusFormik.values.status === 'Pregnant'
+                                                        ? 'Updating...'
+                                                        : 'Pregnant'}
+                                                </Button>
+                                            )}
+                                            {profile?.status !== 'Born' && (
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => handleStatusUpdate('Born')}
+                                                    disabled={updateStatusFormik.isSubmitting}
+                                                    className="w-full"
+                                                >
+                                                    {updateStatusFormik.isSubmitting && updateStatusFormik.values.status === 'Born'
+                                                        ? 'Updating...'
+                                                        : 'Has Been Born'}
+                                                </Button>
+                                            )}
                                         </div>
                                         <Separator />
                                         <DialogFooter>
                                             <DialogClose asChild>
-                                                <Button variant="outline">Cancel</Button>
+                                                <Button variant="outline" disabled={updateStatusFormik.isSubmitting}>
+                                                    Cancel
+                                                </Button>
                                             </DialogClose>
                                         </DialogFooter>
                                     </DialogContent>
@@ -163,10 +221,10 @@ export default function NavFooter() {
                                                 <Button variant="outline">Cancel</Button>
                                             </DialogClose>
                                             <Button
-                                                onClick={formik.handleSubmit}
-                                                disabled={formik.isSubmitting}
+                                                onClick={logoutFormik.handleSubmit}
+                                                disabled={logoutFormik.isSubmitting}
                                             >
-                                                {formik.isSubmitting ? 'Logging out...' : 'Log Out'}
+                                                {logoutFormik.isSubmitting ? 'Logging out...' : 'Log Out'}
                                             </Button>
                                         </DialogFooter>
                                     </DialogContent>

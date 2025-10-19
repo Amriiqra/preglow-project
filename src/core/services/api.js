@@ -23,6 +23,9 @@ export const User = {
 
     getProfile: () =>
         handleRequest(axiosInstance.get("/dashboard/user-info")),
+
+    updateStatusUser: (data) =>
+        handleRequest(axiosInstance.put("/dashboard/update-status", data)),
 };
 
 // ==================== OTP ====================
@@ -46,6 +49,12 @@ export const SendOtp = {
 export const Landing = {
     getArticles: () =>
         handleRequest(axiosInstance.get("/landing/education")),
+
+    getArticlesById: (id) =>
+        handleRequest(axiosInstance.get(`/landing/education/${id}`)),
+
+    getOtherArticlesById: (id) =>
+        handleRequest(axiosInstance.get(`/landing/other-education/${id}`)),
 
     getFAQ: () =>
         handleRequest(axiosInstance.get("/landing/faq")),

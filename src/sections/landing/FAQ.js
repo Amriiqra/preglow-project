@@ -11,17 +11,7 @@ import {
 import * as API from "@/core/services/api";
 import { toast } from 'sonner';
 import useSWR from 'swr';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const FAQItemSkeleton = ({ index }) => (
-    <div className="border-b py-4">
-        <div className="flex justify-between items-center py-2">
-            <Skeleton className="h-6 w-3/4 rounded-md" />
-            <Skeleton className="h-5 w-5 rounded-full" />
-        </div>
-    </div>
-);
-// ----------------------------------
+import { FAQItemSkeleton } from "@/components/shared/skeleton/SkeletonFAQ";
 
 export default function FAQ() {
 
@@ -40,12 +30,10 @@ export default function FAQ() {
         }
     );
 
-    const skeletonCount = 5;
-
     const renderContent = () => {
         if (isLoading) {
-            return Array.from({ length: skeletonCount }).map((_, index) => (
-                <FAQItemSkeleton key={index} index={index} />
+            return Array.from({ length: 5 }).map((_, index) => (
+                <FAQItemSkeleton key={index} />
             ));
         }
 

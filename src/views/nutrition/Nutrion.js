@@ -88,10 +88,10 @@ const nasiGorengData = {
     proteins: "50g",
     carbohydrates: "290g",
     fats: "30g",
-    caloriesDiff: "+200",
-    proteinsDiff: "+10g",
-    carbohydratesDiff: "+5g",
-    fatsDiff: "+5g"
+    caloriesDiff: "200",
+    proteinsDiff: "10g",
+    carbohydratesDiff: "5g",
+    fatsDiff: "5g"
 };
 
 const ProductCard = ({ category, name, protein }) => (
@@ -181,24 +181,24 @@ export default function NutritionView() {
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Calories Consumed</p>
                                     <p className="text-3xl font-bold text-gray-800">1,500</p>
-                                    <p className="text-xs text-green-500">+200</p>
+                                    <p className="text-xs text-green-500">200</p>
                                 </Card>
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Proteins</p>
                                     <p className="text-3xl font-bold text-gray-800">50g</p>
-                                    <p className="text-xs text-green-500">+10g</p>
+                                    <p className="text-xs text-green-500">10g</p>
                                 </Card>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Carbohydrates</p>
                                     <p className="text-3xl font-bold text-gray-800">290g</p>
-                                    <p className="text-xs text-green-500">+5g</p>
+                                    <p className="text-xs text-green-500">5g</p>
                                 </Card>
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Fats</p>
                                     <p className="text-3xl font-bold text-gray-800">30g</p>
-                                    <p className="text-xs text-green-500">+5g</p>
+                                    <p className="text-xs text-green-500">5g</p>
                                 </Card>
                             </div>
                         </div>
