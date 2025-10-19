@@ -33,10 +33,9 @@ export default function ImageUploadPreview({ imageFile, onImageChange, onRemoveI
             <Input
                 id="image-upload"
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/jpg,image/png"
                 onChange={onImageChange}
                 className="sr-only"
-                disabled={!!imageFile}
             />
 
             {previewUrl && (
@@ -45,13 +44,13 @@ export default function ImageUploadPreview({ imageFile, onImageChange, onRemoveI
                         src={previewUrl}
                         alt="Image Preview"
                         fill
-                        objectFit="cover"
-                        objectPosition="center"
+                        className="object-cover"
                     />
                     <Button
                         onClick={onRemoveImage}
                         size="icon"
                         variant="destructive"
+                        type="button"
                         className="absolute top-1 right-1 h-6 w-6 rounded-full p-0"
                     >
                         <X className="h-4 w-4" />
@@ -60,4 +59,4 @@ export default function ImageUploadPreview({ imageFile, onImageChange, onRemoveI
             )}
         </div>
     );
-};
+}

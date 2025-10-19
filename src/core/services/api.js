@@ -64,19 +64,53 @@ export const Landing = {
 
 export const Mood = {
     getDailyMood: () =>
-        handleRequest(axiosInstance.get("/dashboard/daily-mood")),
+        handleRequest(axiosInstance.get("/menu/mood/daily-mood")),
 
     getWeeklyMood: () =>
-        handleRequest(axiosInstance.get("/dashboard/weekly-mood")),
+        handleRequest(axiosInstance.get("/menu/mood/weekly-mood")),
 
     getMonthlyMood: () =>
-        handleRequest(axiosInstance.get("/dashboard/monthly-mood")),
+        handleRequest(axiosInstance.get("/menu/mood/monthly-mood")),
 
     saveDailyMood: (data) =>
-        handleRequest(axiosInstance.post("/dashboard/add-feelings", data)),
+        handleRequest(axiosInstance.post("/menu/mood/add-feelings", data)),
 };
 
 export const Affirmation = {
     getAll: () =>
         handleRequest(axiosInstance.get("/dashboard/affirmation")),
+}
+
+export const Forum = {
+    getAll: (params = {}) => {
+        const { page = 1, limit = 10 } = params;
+        return handleRequest(
+            axiosInstance.get("/menu/forum/all", {
+                params: { page, limit }
+            })
+        );
+    },
+
+    create: (data) =>
+        handleRequest(axiosInstance.post("/menu/forum/add", data)),
+
+    getById: (id) =>
+        handleRequest(axiosInstance.get(`/menu/forum/${id}`)),
+
+    createComment: (id, data) =>
+        handleRequest(axiosInstance.post(`/menu/forum/add-comment/${id}`, data)),
+
+    getAllComment: (id) =>
+        handleRequest(axiosInstance.get(`/menu/forum/get-comment/${id}`)),
+
+    createReply: (id, data) =>
+        handleRequest(axiosInstance.post(`/menu/forum/add-reply/${id}`, data)),
+
+    allReply: (id, data) =>
+        handleRequest(axiosInstance.get(`/menu/forum/get-reply/${id}`, data)),
+}
+
+export const Nutrition = {
+    getDailyNutrition: () =>
+        handleRequest(axiosInstance.get("/menu/food/daily-nutrition")),
 }

@@ -10,13 +10,14 @@ import { TokenManager } from '@/utils/tokenManager';
 export const createAxiosInstance = () => {
     const instance = axios.create({
         baseURL: baseUrl,
-        headers: {
-            'Content-Type': 'application/json',
-        },
     });
 
     instance.interceptors.request.use(
         (config) => {
+            if (!(config.data instanceof FormData)) {
+                config.headers['Content-Type'] = 'application/json';
+            }
+
             if (typeof window !== 'undefined') {
                 try {
                     const token = TokenManager.getToken();

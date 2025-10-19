@@ -16,6 +16,7 @@ import * as API from "@/core/services/api";
 import { useFormik } from 'formik'
 import { toast } from 'sonner';
 import useSWR from "swr";
+import { formatNumber } from "@/config/global";
 
 const moods = [
   { label: "Happy", icon: "😊" },
@@ -85,8 +86,11 @@ export default function DashboardDefault() {
 
   const {
     data: dataAffirmation,
-    isLoadingAffirmation,
   } = useSWR('affirmation', API.Affirmation.getAll);
+
+  const {
+    data: dataDailyNutrition,
+  } = useSWR('nutrition', API.Nutrition.getDailyNutrition);
 
   const { moodChartData, moodChartConfig, mainMood } = useMemo(() => {
     if (!dataDailyMood || !dataDailyMood.mood_count || dataDailyMood.mood_count.length === 0) {
@@ -334,23 +338,23 @@ export default function DashboardDefault() {
                 <div className="grid lg:grid-cols-4 gap-4">
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Calories Consumed</p>
-                    <p className="text-2xl font-medium">1,500</p>
-                    <p className="text-sm text-green-500">200</p>
+                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.calories)}</p>
+                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.calories)}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Proteins</p>
-                    <p className="text-2xl font-medium">50g</p>
-                    <p className="text-sm text-green-500">10g</p>
+                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.protein)}</p>
+                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.protein)}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Carbohydrates</p>
-                    <p className="text-2xl font-medium">290g</p>
-                    <p className="text-sm text-green-500">5g</p>
+                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.carbs)}</p>
+                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.carbs)}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Fats</p>
-                    <p className="text-2xl font-medium">30g</p>
-                    <p className="text-sm text-green-500">5g</p>
+                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.fat)}</p>
+                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.fat)}</p>
                   </Card>
                 </div>
               </div>
