@@ -1,11 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Calendar, Clock, Plus } from "lucide-react";
 
 import { PieChart, Pie, Label } from "recharts";
 import {
@@ -13,7 +12,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import Link from "next/link";
+import * as API from "@/core/services/api";
+import { useFormik } from 'formik'
+import { toast } from 'sonner';
+import useSWR from "swr";
 
 const moods = [
   { label: "Happy", icon: "😊" },
@@ -28,18 +30,18 @@ const moods = [
   { label: "Loved", icon: "😍" },
 ];
 
-const moodChartData = [
-  { type: "Happy", value: 70, fill: "#FFC0CB" },
-  { type: "Sensitive", value: 20, fill: "#B55B77" },
-  { type: "Bored", value: 10, fill: "#F2F2F2" }
+const moodColors = [
+  "#FFC0CB",
+  "#B55B77",
+  "#FFB6C1",
+  "#FF69B4",
+  "#FFE4E1",
+  "#F08080",
+  "#CD5C5C",
+  "#F4A6C4",
+  "#E6B8C9",
+  "#D4A5A5",
 ];
-
-const moodChartConfig = {
-  value: { label: "Persentase Mood" },
-  Happy: { label: "Happy", color: "#FFC0CB" },
-  Sensitive: { label: "Sensitive", color: "#B55B77" },
-  Bored: { label: "Bored", color: "#F2F2F2" }
-};
 
 const MoodSelector = ({ selectedMood, onSelectMood }) => (
   <div className="flex flex-wrap lg:gap-x-5 gap-x-4 gap-y-4 py-3 w-full">
@@ -61,11 +63,105 @@ const MoodSelector = ({ selectedMood, onSelectMood }) => (
 );
 
 export default function DashboardDefault() {
-  const totalMoodEntries = 7;
-  const mainMood = moodChartData[0];
-
   const [selectedMood, setSelectedMood] = useState(null);
-  const [selectedDuration, setSelectedDuration] = useState('Week');
+  const [selectedDuration, setSelectedDuration] = useState('Today');
+
+  const getMoodData = () => {
+    switch (selectedDuration) {
+      case 'Week':
+        return API.Mood.getWeeklyMood();
+      case 'Month':
+        return API.Mood.getMonthlyMood();
+      default:
+        return API.Mood.getDailyMood();
+    }
+  };
+
+  const {
+    data: dataDailyMood,
+    isLoading,
+    mutate
+  } = useSWR(['moodData', selectedDuration], getMoodData);
+
+  const {
+    data: dataAffirmation,
+    isLoadingAffirmation,
+  } = useSWR('affirmation', API.Affirmation.getAll);
+
+  const { moodChartData, moodChartConfig, mainMood } = useMemo(() => {
+    if (!dataDailyMood || !dataDailyMood.mood_count || dataDailyMood.mood_count.length === 0) {
+      return {
+        moodChartData: [],
+        moodChartConfig: { value: { label: "Persentase Mood" } },
+        mainMood: null
+      };
+    }
+
+    const totalMoods = dataDailyMood.total_moods;
+
+    const chartData = dataDailyMood.mood_count.map((mood, index) => ({
+      type: mood.category,
+      value: totalMoods > 0 ? Math.round((mood.count / totalMoods) * 100) : 0,
+      fill: moodColors[index % moodColors.length]
+    }));
+
+    chartData.sort((a, b) => b.value - a.value);
+
+    const config = {
+      value: { label: "Persentase Mood" },
+      ...chartData.reduce((acc, mood) => {
+        acc[mood.type] = {
+          label: mood.type,
+          color: mood.fill
+        };
+        return acc;
+      }, {})
+    };
+
+    return {
+      moodChartData: chartData,
+      moodChartConfig: config,
+      mainMood: chartData[0]
+    };
+  }, [dataDailyMood]);
+
+  const formik = useFormik({
+    initialValues: {
+      category: '',
+      daily_feelings: ''
+    },
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      setSubmitting(true);
+      try {
+        const saveMoodPromise = API.Mood.saveDailyMood(values);
+
+        toast.promise(saveMoodPromise, {
+          loading: "Saving your mood...",
+          success: (data) => {
+            resetForm();
+            setSelectedMood(null);
+            mutate();
+            return data.message || "Mood saved successfully!";
+          },
+          error: (err) => {
+            return `Failed to save mood! ${err.message || "Please try again."}`;
+          },
+        });
+
+        await saveMoodPromise;
+      } catch (error) {
+        console.error("Save mood failed:", error);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
+  React.useEffect(() => {
+    if (selectedMood) {
+      formik.setFieldValue('category', selectedMood);
+    }
+  }, [selectedMood]);
 
   return (
     <div className="p-4 sm:p-8 space-y-8 min-h-screen bg-[#F8F8F8] font-sans">
@@ -80,28 +176,40 @@ export default function DashboardDefault() {
             <CardHeader>
               <CardTitle className="text-2xl text-secondary">Today's Mood & Journal</CardTitle>
               <p className="text-sm text-gray-500 flex items-center gap-2">
-                30 September 2025
+                {new Date().toLocaleDateString('en-US', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <p className="font-medium">Select the mood that best fits your day.</p>
-                <MoodSelector selectedMood={selectedMood} onSelectMood={setSelectedMood} />
-              </div>
+              <form onSubmit={formik.handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <p className="font-medium">Select the mood that best fits your day.</p>
+                  <MoodSelector selectedMood={selectedMood} onSelectMood={setSelectedMood} />
+                </div>
 
-              <div className="space-y-2">
-                <p className="font-medium">Want to add more details?</p>
-                <Textarea
-                  placeholder="Write about your day, your feelings, or anything on your mind..."
-                  className="min-h-[120px] bg-gray-50 resize-none"
-                />
-              </div>
+                <div className="space-y-2">
+                  <p className="font-medium">Want to add more details?</p>
+                  <Textarea
+                    name="daily_feelings"
+                    placeholder="Write about your day, your feelings, or anything on your mind..."
+                    className="min-h-[120px] bg-gray-50 resize-none"
+                    value={formik.values.daily_feelings}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                </div>
 
-              <Button
-                className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-base font-semibold rounded-full"
-              >
-                Save Today's Entry
-              </Button>
+                <Button
+                  type="submit"
+                  disabled={formik.isSubmitting || !formik.values.category || !formik.values.daily_feelings}
+                  className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-base font-semibold rounded-full"
+                >
+                  {formik.isSubmitting ? 'Saving...' : 'Save Today\'s Entry'}
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </div>
@@ -113,7 +221,7 @@ export default function DashboardDefault() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
-                {['Week', 'Month', 'Year'].map((duration) => (
+                {['Today', 'Week', 'Month'].map((duration) => (
                   <Button
                     key={duration}
                     variant="outline"
@@ -129,51 +237,72 @@ export default function DashboardDefault() {
                   </Button>
                 ))}
               </div>
-              <div className="flex items-start justify-center w-full">
-                <div className="space-y-10 flex flex-col items-start w-full">
-                  <div>
-                    <p className="text-sm text-black">Total moods</p>
-                    <p className="text-4xl font-bold text-secondary">{totalMoodEntries}</p>
-                  </div>
-                  <div className="w-[220px] h-[250px] relative">
-                    <ChartContainer
-                      config={moodChartConfig}
-                      className="aspect-square w-full h-full"
-                    >
-                      <PieChart width={220} height={250} margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
-                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
 
-                        <Pie
-                          data={moodChartData}
-                          dataKey="value"
-                          nameKey="type"
-                          innerRadius={70}
-                          outerRadius={100}
-                          stroke="none"
-                          paddingAngle={2}
-                        >
-                          <Label
-                            value={`${mainMood.value}%`}
-                            position="center"
-                            className="fill-black text-4xl font-bold"
-                          />
-                          <Label
-                            value={mainMood.type}
-                            position="center"
-                            dy={22}
-                            className="fill-gray-500 text-base"
-                          />
-                        </Pie>
-                      </PieChart>
-                    </ChartContainer>
-                  </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-gray-400">Loading mood data...</p>
                 </div>
-                <ul className="text-sm space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#FFC0CB]"></span> Happy</li>
-                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#B55B77]"></span> Sensitive</li>
-                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#F2F2F2] border"></span> Bored</li>
-                </ul>
-              </div>
+              ) : moodChartData.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-gray-400">No mood data available</p>
+                </div>
+              ) : (
+                <div className="flex items-start justify-center w-full">
+                  <div className="space-y-10 flex flex-col items-start w-full">
+                    <div>
+                      <p className="text-sm text-black">Total moods</p>
+                      <p className="text-4xl font-bold text-secondary">{dataDailyMood?.total_moods || 0}</p>
+                    </div>
+                    <div className="w-[220px] h-[250px] relative">
+                      <ChartContainer
+                        config={moodChartConfig}
+                        className="aspect-square w-full h-full"
+                      >
+                        <PieChart width={220} height={250} margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
+                          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+
+                          <Pie
+                            data={moodChartData}
+                            dataKey="value"
+                            nameKey="type"
+                            innerRadius={70}
+                            outerRadius={100}
+                            stroke="none"
+                            paddingAngle={2}
+                          >
+                            {mainMood && (
+                              <>
+                                <Label
+                                  value={`${mainMood.value}%`}
+                                  position="center"
+                                  className="fill-black text-4xl font-bold"
+                                />
+                                <Label
+                                  value={mainMood.type}
+                                  position="center"
+                                  dy={22}
+                                  className="fill-gray-500 text-base"
+                                />
+                              </>
+                            )}
+                          </Pie>
+                        </PieChart>
+                      </ChartContainer>
+                    </div>
+                  </div>
+                  <ul className="text-sm space-y-1 pt-2">
+                    {moodChartData.map((mood) => (
+                      <li key={mood.type} className="flex items-center gap-2">
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: mood.fill }}
+                        ></span>
+                        {mood.type}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -184,11 +313,11 @@ export default function DashboardDefault() {
           <Card className="h-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 lg:pb-2">
               <div className="space-y-1">
-                <CardTitle className="text-2xl text-secondary">Today's affirmations</CardTitle>
+                <CardTitle className="text-2xl text-secondary">Affirmations</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-primary text-2xl lg:text-3xl font-bold text-center text-kaisei lg:pb-0 pb-5">"I am worthy of good things and deserve comfort and prosperity".</p>
+              <p className="text-primary text-2xl lg:text-3xl font-bold text-center text-kaisei lg:pb-0 pb-5">"{dataAffirmation?.affirmation?.text}".</p>
             </CardContent>
           </Card>
         </div>
@@ -225,12 +354,6 @@ export default function DashboardDefault() {
                   </Card>
                 </div>
               </div>
-              {/* <div className="flex items-end justify-end h-3/4">
-                <Link href={"/nutrition"} className="flex items-center gap-2 text-sm p-0 h-auto text-secondary">
-                  Explore More Healthy Foods
-                  <ArrowRight size={16} />
-                </Link>
-              </div> */}
             </CardContent>
           </Card>
         </div>

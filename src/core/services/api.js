@@ -59,3 +59,24 @@ export const Landing = {
     getFAQ: () =>
         handleRequest(axiosInstance.get("/landing/faq")),
 };
+
+// ==================== MOOD API ====================
+
+export const Mood = {
+    getDailyMood: () =>
+        handleRequest(axiosInstance.get("/dashboard/daily-mood")),
+
+    getWeeklyMood: () =>
+        handleRequest(axiosInstance.get("/dashboard/weekly-mood")),
+
+    getMonthlyMood: () =>
+        handleRequest(axiosInstance.get("/dashboard/monthly-mood")),
+
+    saveDailyMood: (data) =>
+        handleRequest(axiosInstance.post("/dashboard/add-feelings", data)),
+};
+
+export const Affirmation = {
+    getAll: () =>
+        handleRequest(axiosInstance.get("/dashboard/affirmation")),
+}
