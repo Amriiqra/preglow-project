@@ -6,6 +6,9 @@ import NutritionView from "@/views/nutrition/Nutrion";
 export const metadata = {
     title: "Nutrition Tracker",
     description: "Nutrition Tracker",
+    icons: {
+        icon: '/assets/logosingle.svg',
+    },
 };
 
 const Nutrition = () => {

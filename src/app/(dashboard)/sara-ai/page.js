@@ -6,6 +6,9 @@ import SaraAIView from "@/views/sara-ai/SaraAIView";
 export const metadata = {
     title: "Sara AI",
     description: "Sara AI",
+    icons: {
+        icon: '/assets/logosingle.svg',
+    },
 };
 
 const SaraAI = () => {

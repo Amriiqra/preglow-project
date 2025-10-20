@@ -6,6 +6,9 @@ import MeditationView from "@/views/meditation/MeditationView";
 export const metadata = {
     title: "Meditation Tracker",
     description: "Meditation Tracker",
+    icons: {
+        icon: '/assets/logosingle.svg',
+    },
 };
 
 const Meditation = () => {

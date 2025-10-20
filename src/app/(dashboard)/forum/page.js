@@ -6,6 +6,9 @@ import ForumView from "@/views/forum/ForumView";
 export const metadata = {
     title: "Forum",
     description: "Forum",
+    icons: {
+        icon: '/assets/logosingle.svg',
+    },
 };
 
 const Forum = () => {

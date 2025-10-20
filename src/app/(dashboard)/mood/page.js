@@ -6,6 +6,9 @@ import MoodView from "@/views/mood/Mood";
 export const metadata = {
     title: "Mood",
     description: "Mood",
+    icons: {
+        icon: '/assets/logosingle.svg',
+    },
 };
 
 const Mood = () => {

@@ -20,6 +20,9 @@ const kaisei = Kaisei_Decol({
 export const metadata = {
   title: "Preglow",
   description: "Preglow Application",
+  icons: {
+    icon: '/assets/logosingle.svg',
+  },
 };
 
 export default function RootLayout({ children }) {
