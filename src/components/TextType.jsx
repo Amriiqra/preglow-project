@@ -95,7 +95,7 @@ const TextType = ({
 
           setCurrentTextIndex(prev => (prev + 1) % textArray.length);
           setCurrentCharIndex(0);
-          timeout = setTimeout(() => {}, pauseDuration);
+          timeout = setTimeout(() => { }, pauseDuration);
         } else {
           timeout = setTimeout(() => {
             setDisplayedText(prev => prev.slice(0, -1));
@@ -107,10 +107,16 @@ const TextType = ({
             setDisplayedText(prev => prev + processedText[currentCharIndex]);
             setCurrentCharIndex(prev => prev + 1);
           }, variableSpeed ? getRandomSpeed() : typingSpeed);
-        } else if (textArray.length > 1) {
-          timeout = setTimeout(() => {
-            setIsDeleting(true);
-          }, pauseDuration);
+        } else {
+          if (onSentenceComplete) {
+            onSentenceComplete(textArray[currentTextIndex], currentTextIndex);
+          }
+
+          if (textArray.length > 1 || loop) {
+            timeout = setTimeout(() => {
+              setIsDeleting(true);
+            }, pauseDuration);
+          }
         }
       }
     };
@@ -122,7 +128,6 @@ const TextType = ({
     }
 
     return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     currentCharIndex,
     displayedText,

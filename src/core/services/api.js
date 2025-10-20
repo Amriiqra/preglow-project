@@ -108,6 +108,12 @@ export const Forum = {
 
     allReply: (id, data) =>
         handleRequest(axiosInstance.get(`/menu/forum/get-reply/${id}`, data)),
+
+    createReplyOfReply: (id, data) =>
+        handleRequest(axiosInstance.post(`/menu/forum/add-reofre/${id}`, data)),
+
+    allReplyOfReply: (id, data) =>
+        handleRequest(axiosInstance.get(`/menu/forum/get-reofre/${id}`, data)),
 }
 
 export const Nutrition = {

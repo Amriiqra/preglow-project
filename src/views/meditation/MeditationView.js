@@ -5,6 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import TextType from '@/components/TextType';
+import * as API from "@/core/services/api";
 
 const MEDITATION_SOUND_URL = "/audio/AXIS1195_15_The Passage_Full.mp3";
 const SESSION_DURATION = 5 * 60;
@@ -40,6 +41,27 @@ export default function MeditationView() {
     const currentStep = meditationSteps[step - 1];
     const [timer, setTimer] = useState(SESSION_DURATION);
     const [timerActive, setTimerActive] = useState(false);
+    const [affirmationText, setAffirmationText] = useState("");
+    const [affirmationKey, setAffirmationKey] = useState(0);
+    const isFetchingRef = useRef(false);
+
+    const fetchAffirmation = async () => {
+        try {
+            const response = await API.Affirmation.getAll();
+            if (response?.affirmation?.text) {
+                setAffirmationText(response.affirmation.text);
+                setAffirmationKey(prev => prev + 1);
+            }
+        } catch (error) {
+            console.error("Failed to fetch affirmation:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (step === 3) {
+            fetchAffirmation();
+        }
+    }, [step]);
 
     useEffect(() => {
         if (!audioRef.current) return;
@@ -109,6 +131,18 @@ export default function MeditationView() {
         setIsAudioPlaying(true);
     };
 
+    const handleAffirmationComplete = () => {
+        if (isFetchingRef.current) return;
+
+        isFetchingRef.current = true;
+        setTimeout(async () => {
+            await fetchAffirmation();
+            isFetchingRef.current = false;
+        }, 2000);
+    };
+
+
+
     const renderContent = () => {
         if (step === 0) {
             return (
@@ -135,15 +169,21 @@ export default function MeditationView() {
                 <div className="p-0 space-y-6 relative">
                     {currentStep.isFinal ? (
                         <div className="max-w-md mx-auto text-center">
-                            <TextType
-                                text={["Text typing effect", "for your websites", "Happy coding!"]}
-                                typingSpeed={75}
-                                pauseDuration={1000}
-                                showCursor={false}
-                                cursorCharacter="|"
-                                loop={true}
-                                className="text-3xl md:text-2xl text-white/90 leading-relaxed font-semibold"
-                            />
+                            {affirmationText ? (
+                                <TextType
+                                    key={affirmationKey}
+                                    text={[affirmationText]}
+                                    typingSpeed={75}
+                                    pauseDuration={1000}
+                                    showCursor={false}
+                                    cursorCharacter="|"
+                                    loop={false}
+                                    onSentenceComplete={handleAffirmationComplete}
+                                    className="text-3xl md:text-2xl text-white/90 leading-relaxed font-semibold"
+                                />
+                            ) : (
+                                <p className="text-2xl text-white/70">Loading affirmation...</p>
+                            )}
                         </div>
                     ) : (
                         <>
@@ -162,7 +202,7 @@ export default function MeditationView() {
                                 <p className="text-6xl font-extrabold text-[#E78E8D]">
                                     {formatTime(timer)}
                                 </p>
-                                {timer < 0 ? (
+                                {timer === 0 ? (
                                     <>
                                         <span className='bg-green-100 opacity-80 text-green-500 p-2 rounded-full'>Session Finished</span>
                                         <Button

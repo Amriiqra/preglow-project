@@ -4,10 +4,9 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import { toast } from "sonner";
 import * as API from "@/core/services/api";
-import * as Yup from "yup";
 import { replyValidationSchema } from "./ValidationSchema";
 
-export default function ReplyForm({ commentId, onCancel, onSuccess }) {
+export default function ReplyForm({ commentId, onCancel, onSuccess, isReplyOfReply = false }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const formik = useFormik({
@@ -23,9 +22,11 @@ export default function ReplyForm({ commentId, onCancel, onSuccess }) {
 
             setIsSubmitting(true);
 
-            const replyPromise = API.Forum.createReply(commentId, {
-                content: values.content
-            }).then((response) => {
+            const apiCall = isReplyOfReply
+                ? API.Forum.createReplyOfReply(commentId, { content: values.content })
+                : API.Forum.createReply(commentId, { content: values.content });
+
+            const replyPromise = apiCall.then((response) => {
                 if (response) {
                     resetForm();
                     if (onSuccess) onSuccess();
