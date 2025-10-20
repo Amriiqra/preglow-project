@@ -72,6 +72,15 @@ export const Mood = {
     getMonthlyMood: () =>
         handleRequest(axiosInstance.get("/menu/mood/monthly-mood")),
 
+    getAllDailyMood: (params = {}) => {
+        const { page = 1, limit = 10 } = params;
+        return handleRequest(
+            axiosInstance.get("/menu/mood/all", {
+                params: { page, limit }
+            })
+        );
+    },
+
     saveDailyMood: (data) =>
         handleRequest(axiosInstance.post("/menu/mood/add-feelings", data)),
 };
