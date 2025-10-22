@@ -129,3 +129,11 @@ export const Nutrition = {
     getDailyNutrition: () =>
         handleRequest(axiosInstance.get("/menu/food/daily-nutrition")),
 }
+
+export const SaraAI = {
+    getChatHistory: () =>
+        handleRequest(axiosInstance.get("/menu/chatbot/history")),
+
+    createChat: (data) =>
+        handleRequest(axiosInstance.post(`menu/chatbot`, data)),
+}
