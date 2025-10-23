@@ -58,3 +58,8 @@ export const formatNutritionValue = (value) => {
         return value;
     }
 };
+
+export const cleanPercentage = (percentageString) => {
+    if (!percentageString) return '';
+    return percentageString.replace(/\.0%$/, '%');
+};

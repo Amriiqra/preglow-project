@@ -16,7 +16,7 @@ import * as API from "@/core/services/api";
 import { useFormik } from 'formik'
 import { toast } from 'sonner';
 import useSWR from "swr";
-import { formatNumber, formatNutritionValue } from "@/config/global";
+import { cleanPercentage, formatNumber, formatNutritionValue } from "@/config/global";
 
 const moods = [
   { label: "Happy", icon: "😊" },
@@ -101,13 +101,18 @@ export default function DashboardDefault() {
       };
     }
 
-    const totalMoods = dataDailyMood.total_moods;
+    const apiMoodCounts = dataDailyMood.mood_count;
 
-    const chartData = dataDailyMood.mood_count.map((mood, index) => ({
-      type: mood.category,
-      value: totalMoods > 0 ? Math.round((mood.count / totalMoods) * 100) : 0,
-      fill: moodColors[index % moodColors.length]
-    }));
+    const chartData = apiMoodCounts.map((mood, index) => {
+      const numericValue = parseFloat(mood.percentage.replace('%', ''));
+
+      return {
+        type: mood.category,
+        value: numericValue,
+        percentageLabel: cleanPercentage(mood.percentage),
+        fill: moodColors[index % moodColors.length]
+      };
+    });
 
     chartData.sort((a, b) => b.value - a.value);
 
@@ -127,7 +132,7 @@ export default function DashboardDefault() {
     if (calculatedMainMood) {
       calculatedMainMood = {
         ...calculatedMainMood,
-        value: Math.min(calculatedMainMood.value, 100)
+        percentageLabel: calculatedMainMood.value > 100 ? '100%' : calculatedMainMood.percentageLabel
       };
     }
 
@@ -273,7 +278,6 @@ export default function DashboardDefault() {
                       >
                         <PieChart width={220} height={250} margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
                           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-
                           <Pie
                             data={moodChartData}
                             dataKey="value"
@@ -286,7 +290,7 @@ export default function DashboardDefault() {
                             {mainMood && (
                               <>
                                 <Label
-                                  value={`${mainMood.value}%`}
+                                  value={`${mainMood.percentageLabel}`}
                                   position="center"
                                   className="fill-black text-4xl font-bold"
                                 />

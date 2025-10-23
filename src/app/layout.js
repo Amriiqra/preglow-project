@@ -11,11 +11,11 @@ const figtree = Figtree({
   weight: ["400", "500", "600", "700"],
 });
 
-const kaisei = Kaisei_Decol({
-  variable: "--font-kaisei",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
+// const kaisei = Kaisei_Decol({
+//   variable: "--font-kaisei",
+//   subsets: ["latin"],
+//   weight: ["400", "500", "700"],
+// });
 
 export const metadata = {
   title: "Preglow",
@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${figtree.variable} ${kaisei.variable} antialiased`}
+        className={`${figtree.variable} antialiased`}
       >
         <Suspense fallback={<Loader />}>
           {children}

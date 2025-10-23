@@ -15,9 +15,9 @@ import * as API from "@/core/services/api";
 import { useFormik } from 'formik'
 import { toast } from 'sonner';
 import useSWR from "swr";
-import { ForumThreadSkeleton } from "@/components/shared/skeleton/SkeletonListForum";
-import { MoodSkeleton } from "@/components/shared/skeleton/MoodSkeleton";
+import { MoodHistoryItemSkeleton, MoodSkeleton } from "@/components/shared/skeleton/MoodSkeleton";
 import { MoodDetailDialog } from "./MoodDetailDialog";
+import { cleanPercentage } from "@/config/global";
 
 const moods = [
     { label: "Happy", icon: "😊" },
@@ -171,13 +171,18 @@ export default function MoodView() {
             };
         }
 
-        const totalMoods = dataDailyMood.total_moods;
+        const apiMoodCounts = dataDailyMood.mood_count;
 
-        const chartData = dataDailyMood.mood_count.map((mood, index) => ({
-            type: mood.category,
-            value: totalMoods > 0 ? Math.round((mood.count / totalMoods) * 100) : 0,
-            fill: moodColors[index % moodColors.length]
-        }));
+        const chartData = apiMoodCounts.map((mood, index) => {
+            const numericValue = parseFloat(mood.percentage.replace('%', ''));
+
+            return {
+                type: mood.category,
+                value: numericValue,
+                percentageLabel: cleanPercentage(mood.percentage),
+                fill: moodColors[index % moodColors.length]
+            };
+        });
 
         chartData.sort((a, b) => b.value - a.value);
 
@@ -197,7 +202,7 @@ export default function MoodView() {
         if (calculatedMainMood) {
             calculatedMainMood = {
                 ...calculatedMainMood,
-                value: Math.min(calculatedMainMood.value, 100)
+                percentageLabel: calculatedMainMood.value > 100 ? '100%' : calculatedMainMood.percentageLabel
             };
         }
 
@@ -354,7 +359,7 @@ export default function MoodView() {
                                                         {mainMood && (
                                                             <>
                                                                 <Label
-                                                                    value={`${mainMood.value}%`}
+                                                                    value={`${mainMood.percentageLabel}`}
                                                                     position="center"
                                                                     className="fill-black text-4xl font-bold"
                                                                 />
@@ -429,7 +434,11 @@ export default function MoodView() {
                 </Card>
             </div>
             <ScrollArea className="h-[600px] w-full">
-                {!isInitialLoading && dailyMood.length > 0 ? (
+                {isInitialLoading && dailyMood.length === 0 ? (
+                    <div className="space-y-4">
+                        {[...Array(6)].map((_, i) => <MoodHistoryItemSkeleton key={i} />)}
+                    </div>
+                ) : dailyMood.length > 0 ? (
                     <div className="space-y-4">
                         {dailyMood.map((item, index) => (
                             <MoodHistoryItem

@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
-export const AddMealDialog = ({ isDialogOpen, setIsDialogOpen, mutateDailyNutrition, fetchFood }) => {
+export const AddMealDialog = ({ isDialogOpen, setIsDialogOpen, mutateDailyNutrition, fetchFood, mutateLastMeal, mutateWeeklyNutrition }) => {
 
     const formik = useFormik({
         initialValues: initialFoodValues,
@@ -41,7 +41,9 @@ export const AddMealDialog = ({ isDialogOpen, setIsDialogOpen, mutateDailyNutrit
                 resetForm();
                 setIsDialogOpen(false);
 
+                await mutateLastMeal();
                 await mutateDailyNutrition();
+                await mutateWeeklyNutrition();
                 await fetchFood(1);
 
             } catch (error) {

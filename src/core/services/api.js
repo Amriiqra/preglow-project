@@ -138,10 +138,16 @@ export const Nutrition = {
     getDailyNutrition: () =>
         handleRequest(axiosInstance.get("/menu/food/daily-nutrition")),
 
+    getWeeklyNutrition: () =>
+        handleRequest(axiosInstance.get("/menu/food/weekly-nutrition")),
+
     getReportDailyNutrition: () =>
         handleRequest(axiosInstance.get("/menu/food/report")),
 
-    createFood: ( data) =>
+    getLastMeal: () =>
+        handleRequest(axiosInstance.get("/menu/food/last")),
+
+    createFood: (data) =>
         handleRequest(axiosInstance.post(`/menu/food/add`, data)),
 }
 
