@@ -35,8 +35,26 @@ export const formatContent = (rawContent) => {
 
 export const formatNumber = (number) => {
     if (number === null || number === undefined || isNaN(Number(number))) {
-        return 'N/A';
+        return 0;
     }
 
     return new Intl.NumberFormat('id-ID').format(number);
+};
+
+export const formatNutritionValue = (value) => {
+    if (!value) return "0 g";
+
+    const parts = value.trim().split(" ");
+    let numberStr = parts[0];
+    const unit = parts.length > 1 ? ` ${parts[1]}` : "";
+
+    try {
+        const number = parseFloat(numberStr);
+        if (isNaN(number)) return value;
+
+        return number.toFixed(1) + unit;
+    } catch (e) {
+        console.error("Formatting error:", e);
+        return value;
+    }
 };

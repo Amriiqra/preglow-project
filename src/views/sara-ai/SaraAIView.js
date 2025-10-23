@@ -52,7 +52,7 @@ const fetcher = async () => {
 
 
 export default function SaraAIView() {
-    const userName = "Amri";
+    const userName = localStorage.getItem('name');
 
     const [input, setInput] = React.useState("");
     const [localMessages, setLocalMessages] = React.useState([]);
@@ -142,7 +142,7 @@ export default function SaraAIView() {
             return (
                 <div className="w-full max-w-4xl mx-auto pt-20 space-y-12">
                     <div className="text-center space-y-2">
-                        <h1 className="text-4xl font-bold text-primary">
+                        <h1 className="text-4xl font-bold text-primary capitalize">
                             Hello, {userName}
                         </h1>
                         <p className="text-2xl text-primary">

@@ -3,7 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 import { CircleUser, EllipsisVertical, LogOut } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Dialog,
     DialogClose,
@@ -33,6 +33,14 @@ export default function NavFooter() {
         mutate
     } = useSWR('userProfile', API.User.getProfile);
 
+    const username = profile?.username;
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && username) {
+            localStorage.setItem('name', username);
+        }
+    }, [username]);
+
     const logoutFormik = useFormik({
         initialValues: {},
         onSubmit: async (values, { setSubmitting }) => {
@@ -44,6 +52,7 @@ export default function NavFooter() {
                     loading: "Logging out...",
                     success: (data) => {
                         TokenManager.removeToken();
+                        localStorage.removeItem('name');
                         return data.message || "Logout successful!";
                     },
                     error: (err) => {

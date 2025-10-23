@@ -59,6 +59,7 @@ export const TokenManager = {
         try {
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(TOKEN_EXPIRY_KEY);
+            localStorage.removeItem('name');
         } catch (error) {
             console.error('❌ Failed to remove token:', error);
         }

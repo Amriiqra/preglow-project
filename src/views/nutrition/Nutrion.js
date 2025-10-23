@@ -3,33 +3,17 @@
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import * as API from "@/core/services/api";
+import useSWR from "swr";
 import { BarChart, Bar, AreaChart, Area, XAxis } from "recharts";
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { toast } from "sonner";
+import { AddMealDialog } from "./AddMealDialog";
+import { formatNutritionValue } from "@/config/global";
 
 const dailyIntakeData = [
     { day: "Sen", intake: 1500 },
@@ -66,14 +50,6 @@ const lineChartConfig = {
         color: "#FF90A7",
     },
 };
-
-const productData = [
-    { category: "Food", name: "Grilled Chicken Breast", protein: "25g" },
-    { category: "Drink", name: "Soy Milk", protein: "8g" },
-    { category: "Snack", name: "Greek Yogurt", protein: "10g" },
-    { category: "Supplement", name: "Whey Protein", protein: "20g" },
-    { category: "Supplement", name: "Essential Fatty Acids", protein: "0g" },
-];
 
 const mealData = [
     { time: "Breakfast", calories: 350, icon: "🥚" },
@@ -126,7 +102,7 @@ const MealItem = ({ time, calories, icon }) => (
 );
 
 const FeaturedRecentMeal = ({ data }) => (
-    <div className="lg:p-4  mt-4 h-full flex flex-col">
+    <div className="lg:p-4  mt-4 h-full flex flex-col pb-28 lg:pb-20">
         <h1 className="text-lg font-bold text-gray-800 mb-4">{data.name}</h1>
         <div className="grid grid-cols-2 gap-4 flex-grow">
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
@@ -155,6 +131,70 @@ const FeaturedRecentMeal = ({ data }) => (
 
 
 export default function NutritionView() {
+    const [isInitialLoading, setIsInitialLoading] = React.useState(true);
+    const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+    const [foods, setFoods] = React.useState([]);
+    const [hasMore, setHasMore] = React.useState(true);
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+
+    const {
+        data: dataDailyNutrition,
+        mutate: mutateDailyNutrition,
+    } = useSWR('nutrition', API.Nutrition.getDailyNutrition);
+
+    const limit = 10;
+
+    const fetchFood = async (page) => {
+        try {
+            if (page === 1) {
+                setIsInitialLoading(true);
+            } else {
+                setIsLoadingMore(true);
+            }
+
+            const data = await API.Nutrition.getAllFood({ page, limit });
+
+            if (page === 1) {
+                setFoods(data.foods);
+            } else {
+                setFoods(prev => [...prev, ...data.foods]);
+            }
+
+            setHasMore(page < data.totalPages);
+        } catch (error) {
+            console.error("Error fetching food:", error);
+            toast.error("Failed to load food");
+        } finally {
+            setIsInitialLoading(false);
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleReportDailyNutrition = async () => {
+        try {
+            const response = await API.Nutrition.getReportDailyNutrition();
+
+            if (response && response.url) {
+                const pdfUrl = response.url;
+
+                window.open(pdfUrl, '_blank');
+
+                toast.success("Detailed report opened in a new tab.");
+
+            } else {
+                toast.error("Failed to generate or retrieve the report link.");
+                console.error("API response missing report URL:", response);
+            }
+        } catch (error) {
+            const errorMessage = error.message || "Failed to open report. Please try again.";
+            toast.error(errorMessage);
+        }
+    }
+
+    React.useEffect(() => {
+        fetchFood(1);
+    }, []);
+
     return (
         <div className="p-4 lg:p-8 space-y-5 lg:space-y-8 min-h-screen bg-[#F8F8F8]">
 
@@ -169,7 +209,11 @@ export default function NutritionView() {
                             </CardTitle>
                             <p className="text-sm text-gray-500">See how your meals stack up today.</p>
                         </div>
-                        <Button size="sm" className="text-white bg-primary hover:bg-primary/90 text-sm">
+                        <Button
+                            size="sm"
+                            className="text-white bg-primary hover:bg-primary/90 text-sm"
+                            onClick={handleReportDailyNutrition}
+                        >
                             View Detailed Report
                         </Button>
                     </div>
@@ -180,25 +224,33 @@ export default function NutritionView() {
                             <div className="grid grid-cols-2 gap-4">
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Calories Consumed</p>
-                                    <p className="text-3xl font-bold text-gray-800">1,500</p>
-                                    <p className="text-xs text-green-500">200</p>
+                                    <p className="text-3xl font-bold text-gray-800">{dataDailyNutrition?.totalNutrition?.calories}</p>
+                                    <p className="text-xs text-green-500">{dataDailyNutrition?.lastNutrition?.calories}</p>
                                 </Card>
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Proteins</p>
-                                    <p className="text-3xl font-bold text-gray-800">50g</p>
-                                    <p className="text-xs text-green-500">10g</p>
+                                    <p className="text-3xl font-bold text-gray-800">{dataDailyNutrition?.totalNutrition?.protein}</p>
+                                    <p className="text-xs text-green-500">{dataDailyNutrition?.lastNutrition?.protein}</p>
                                 </Card>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Carbohydrates</p>
-                                    <p className="text-3xl font-bold text-gray-800">290g</p>
-                                    <p className="text-xs text-green-500">5g</p>
+                                    <p className="text-3xl font-bold text-gray-800">
+                                        {formatNutritionValue(dataDailyNutrition?.totalNutrition?.carbs)}
+                                    </p>
+                                    <p className="text-xs text-green-500">
+                                        {formatNutritionValue(dataDailyNutrition?.lastNutrition?.carbs)}
+                                    </p>
                                 </Card>
                                 <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
                                     <p className="text-sm text-gray-500">Fats</p>
-                                    <p className="text-3xl font-bold text-gray-800">30g</p>
-                                    <p className="text-xs text-green-500">5g</p>
+                                    <p className="text-3xl font-bold text-gray-800">
+                                        {formatNutritionValue(dataDailyNutrition?.totalNutrition?.fat)}
+                                    </p>
+                                    <p className="text-xs text-green-500">
+                                        {formatNutritionValue(dataDailyNutrition?.lastNutrition?.fat)}
+                                    </p>
                                 </Card>
                             </div>
                         </div>
@@ -224,67 +276,30 @@ export default function NutritionView() {
                 </CardContent>
             </Card>
 
-            <div className="space-y-4 pt-4">
+            <div className="space-y-0 pt-4">
                 <h2 className="text-xl font-bold text-gray-800">History Meals</h2>
                 <p className="text-sm text-gray-500">
                     Browse through various food, drinks, snacks, and supplements you have logged.
                 </p>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {productData.map((product, index) => (
-                        <ProductCard key={index} category={product.category} name={product.name} protein={product.protein} />
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 pt-10">
+                    {foods.map((product, index) => (
+                        <ProductCard key={index} category={product.category} name={product.name} protein={product.calories} />
                     ))}
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 **items-stretch**">
-                <div className="p-4 **h-full** mb-30">
+                <div className="p-4 h-full mb-30">
                     <h2 className="text-xl font-bold text-gray-800">Recent Meals</h2>
                     <p className="text-sm text-gray-500 mb-4">View the meals you have consumed this week</p>
 
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" className="text-white bg-primary border-gray-400 hover:bg-primary/90 hover:text-white">
-                                <Plus className="w-4 h-4 mr-2" /> Add New Meal
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Add New Meal</DialogTitle>
-                                <DialogDescription>
-                                    Fill in the details below to add a new meal to your nutrition.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4">
-                                <div className="grid gap-3">
-                                    <Label htmlFor="category">Category</Label>
-                                    <Select>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select a category" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectItem value="breakfast">Breakfast</SelectItem>
-                                                <SelectItem value="lunch">Lunch</SelectItem>
-                                                <SelectItem value="dinner">Dinner</SelectItem>
-                                                <SelectItem value="snack">Snack</SelectItem>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="grid gap-3">
-                                    <Label htmlFor="food-item">Food Name</Label>
-                                    <Input id="food-item" name="food-item" placeholder="Food Name" />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
-                                </DialogClose>
-                                <Button type="submit" className="bg-primary hover:bg-primary/90">Save changes</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <AddMealDialog
+                        isDialogOpen={isDialogOpen}
+                        setIsDialogOpen={setIsDialogOpen}
+                        mutateDailyNutrition={mutateDailyNutrition}
+                        fetchFood={fetchFood}
+                    />
 
                     <FeaturedRecentMeal data={nasiGorengData} />
 

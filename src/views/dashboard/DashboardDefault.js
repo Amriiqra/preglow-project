@@ -338,23 +338,23 @@ export default function DashboardDefault() {
                 <div className="grid lg:grid-cols-4 gap-4">
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Calories Consumed</p>
-                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.calories)}</p>
-                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.calories)}</p>
+                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.calories}</p>
+                    <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.calories}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Proteins</p>
-                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.protein)}</p>
-                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.protein)}</p>
+                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.protein}</p>
+                    <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.protein}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Carbohydrates</p>
-                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.carbs)}</p>
-                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.carbs)}</p>
+                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.carbs}</p>
+                    <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.carbs}</p>
                   </Card>
-                  <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
+                  <Card className="text-start gap-0 p-4 rounded-md shapiadow-none text-secondary">
                     <p>Fats</p>
-                    <p className="text-2xl font-medium">{formatNumber(dataDailyNutrition?.totalNutrition?.fat)}</p>
-                    <p className="text-sm text-green-500">{formatNumber(dataDailyNutrition?.lastNutrition?.fat)}</p>
+                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.fat}</p>
+                    <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.fat}</p>
                   </Card>
                 </div>
               </div>

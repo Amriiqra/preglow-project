@@ -126,8 +126,23 @@ export const Forum = {
 }
 
 export const Nutrition = {
+    getAllFood: (params = {}) => {
+        const { page = 1, limit = 10 } = params;
+        return handleRequest(
+            axiosInstance.get("/menu/food/all", {
+                params: { page, limit }
+            })
+        );
+    },
+
     getDailyNutrition: () =>
         handleRequest(axiosInstance.get("/menu/food/daily-nutrition")),
+
+    getReportDailyNutrition: () =>
+        handleRequest(axiosInstance.get("/menu/food/report")),
+
+    createFood: ( data) =>
+        handleRequest(axiosInstance.post(`/menu/food/add`, data)),
 }
 
 export const SaraAI = {
