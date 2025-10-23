@@ -16,7 +16,7 @@ import * as API from "@/core/services/api";
 import { useFormik } from 'formik'
 import { toast } from 'sonner';
 import useSWR from "swr";
-import { formatNumber } from "@/config/global";
+import { formatNumber, formatNutritionValue } from "@/config/global";
 
 const moods = [
   { label: "Happy", icon: "😊" },
@@ -122,10 +122,19 @@ export default function DashboardDefault() {
       }, {})
     };
 
+    let calculatedMainMood = chartData[0];
+
+    if (calculatedMainMood) {
+      calculatedMainMood = {
+        ...calculatedMainMood,
+        value: Math.min(calculatedMainMood.value, 100)
+      };
+    }
+
     return {
       moodChartData: chartData,
       moodChartConfig: config,
-      mainMood: chartData[0]
+      mainMood: calculatedMainMood
     };
   }, [dataDailyMood]);
 
@@ -348,13 +357,13 @@ export default function DashboardDefault() {
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Carbohydrates</p>
-                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.carbs}</p>
-                    <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.carbs}</p>
+                    <p className="text-2xl font-medium">{formatNutritionValue(dataDailyNutrition?.totalNutrition?.carbs)}</p>
+                    <p className="text-sm text-green-500">{formatNutritionValue(dataDailyNutrition?.lastNutrition?.carbs)}</p>
                   </Card>
-                  <Card className="text-start gap-0 p-4 rounded-md shapiadow-none text-secondary">
+                  <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Fats</p>
-                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.fat}</p>
-                    <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.fat}</p>
+                    <p className="text-2xl font-medium">{formatNutritionValue(dataDailyNutrition?.totalNutrition?.fat)}</p>
+                    <p className="text-sm text-green-500">{formatNutritionValue(dataDailyNutrition?.lastNutrition?.fat)}</p>
                   </Card>
                 </div>
               </div>

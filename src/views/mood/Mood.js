@@ -192,10 +192,19 @@ export default function MoodView() {
             }, {})
         };
 
+        let calculatedMainMood = chartData[0];
+
+        if (calculatedMainMood) {
+            calculatedMainMood = {
+                ...calculatedMainMood,
+                value: Math.min(calculatedMainMood.value, 100)
+            };
+        }
+
         return {
             moodChartData: chartData,
             moodChartConfig: config,
-            mainMood: chartData[0]
+            mainMood: calculatedMainMood
         };
     }, [dataDailyMood]);
 
