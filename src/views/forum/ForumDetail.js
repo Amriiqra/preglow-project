@@ -101,7 +101,7 @@ export default function ForumDetail() {
                     href="/forum"
                     className="bg-transparent border-2 border-secondary text-secondary p-1 rounded-lg hover:bg-secondary/80 hover:text-white transition-colors"
                 >
-                    <ChevronLeft size={30}/>
+                    <ChevronLeft />
                 </Link>
                 <h1 className="text-2xl lg:text-3xl font-bold text-secondary">FORUM DETAIL</h1>
             </div>
