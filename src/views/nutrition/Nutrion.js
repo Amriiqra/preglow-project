@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NutritionStatsSkeleton } from "@/components/shared/skeleton/NutritionStatsSkeleton";
 import { ProductListSkeleton } from "@/components/shared/skeleton/ProductListSkeleton";
 import { RecentMealAndChartSkeleton } from "@/components/shared/skeleton/RecentMealAndChartSkeleton";
+import moment from "moment";
 
 const MEAL_ICONS = {
     "Breakfast": "🥚",
@@ -26,26 +27,62 @@ const MEAL_ICONS = {
     "Snack": "🍎",
 };
 
-const dailyIntakeData = [
-    { day: "Sen", intake: 1500 },
-    { day: "Sel", intake: 1800 },
-    { day: "Rab", intake: 1650 },
-    { day: "Kam", intake: 1400 },
-    { day: "Jum", intake: 2000 },
-    { day: "Sab", intake: 1900 },
-    { day: "Min", intake: 1750 },
-];
+const getTodayDateStringDisplay = () => {
+    return moment().format('DD/MM/YYYY');
+}
+
+const convertDisplayDateToApiDate = (displayDate) => {
+    if (!displayDate) return null;
+    return moment(displayDate, 'DD/MM/YYYY').format('DD-MM-YYYY');
+}
+
+const getPastSevenDaysData = () => {
+    const data = [];
+    const staticIntake = [1500, 1800, 1650, 1400, 2000, 1900, 1750];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = moment().subtract(i, 'days');
+        const dayName = date.format('ddd').slice(0, 3);
+        const dateDisplayString = date.format('DD/MM/YYYY');
+
+        data.push({
+            day: dayName,
+            intake: staticIntake[6 - i],
+            date: dateDisplayString
+        });
+    }
+    return data;
+};
+
+const CustomBar = (props) => {
+    const { fill, x, y, width, height, payload, selectedDate } = props;
+    const isSelected = payload.date === selectedDate;
+    const barFill = isSelected ? '#e84f74' : '#ff90a7';
+
+    return (
+        <rect
+            x={x}
+            y={y}
+            width={width}
+            height={height}
+            fill={barFill}
+            rx={4}
+            ry={4}
+            style={{ cursor: 'pointer' }}
+        />
+    );
+};
 
 const barChartConfig = {
     intake: {
-        label: "Kalori",
+        label: "Calories",
         color: "#FF90A7",
     },
 };
 
 const lineChartConfig = {
     calories: {
-        label: "Kalori",
+        label: "Calories",
         color: "#FF90A7",
     },
 };
@@ -83,7 +120,7 @@ const MealItem = ({ time, calories, icon }) => (
 
 const FeaturedRecentMeal = ({ data }) => (
     <div className="mt-4 h-full flex flex-col pb-28 lg:pb-20">
-        <h1 className="text-lg font-bold text-gray-800 mb-4">{data?.name}</h1>
+        <h1 className="text-lg font-bold text-gray-800 mb-4 capitalize">{data?.name}</h1>
         <div className="grid grid-cols-2 gap-4 flex-grow">
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
                 <p className="lg:text-2xl text-xl text-gray-500">Calories Consumed</p>
@@ -105,21 +142,30 @@ const FeaturedRecentMeal = ({ data }) => (
     </div>
 );
 
-const renderStatCardContent = (label, totalValue, lastValue, isLoading) => (
-    <>
-        <p className="text-sm text-gray-500">{label}</p>
-        {isLoading ? (
-            <Skeleton className="w-1/2 h-8 mx-auto mt-1 mb-1" />
-        ) : (
-            <p className="text-3xl font-bold text-gray-800">{totalValue}</p>
-        )}
-        {isLoading ? (
-            <Skeleton className="w-1/4 h-3 mx-auto" />
-        ) : (
-            <p className="text-xs text-green-500">{lastValue}</p>
-        )}
-    </>
-);
+const renderStatCardContent = (label, totalValue, lastValue, isLoading) => {
+    const displayTotalValue = totalValue && totalValue.toString().trim() !== '' ? totalValue : (label === "Calories Consumed" ? "0 kcal" : "0 g");
+    const displayLastValue = lastValue && lastValue.toString().trim() !== '' ? lastValue : null;
+
+    return (
+        <>
+            <p className="text-sm text-gray-500">{label}</p>
+            {isLoading ? (
+                <Skeleton className="w-1/2 h-8 mx-auto mt-1 mb-1" />
+            ) : (
+                <p className="text-3xl font-bold text-gray-800">{displayTotalValue}</p>
+            )}
+            {isLoading ? (
+                <Skeleton className="w-1/4 h-3 mx-auto" />
+            ) : (
+                displayLastValue ? (
+                    <p className="text-xs text-green-500">{displayLastValue}</p>
+                ) : (
+                    <div className="h-3"></div>
+                )
+            )}
+        </>
+    );
+};
 
 
 export default function NutritionView() {
@@ -128,12 +174,14 @@ export default function NutritionView() {
     const [foods, setFoods] = React.useState([]);
     const [hasMore, setHasMore] = React.useState(true);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+    const [selectedDate, setSelectedDate] = React.useState(getTodayDateStringDisplay());
+    const apiDate = convertDisplayDateToApiDate(selectedDate);
 
     const {
         data: dataDailyNutrition,
         isLoading: isDailyLoading,
         mutate: mutateDailyNutrition,
-    } = useSWR('nutrition', API.Nutrition.getDailyNutrition);
+    } = useSWR(['nutrition', selectedDate], () => API.Nutrition.getDailyNutrition({ date: apiDate }));
 
     const {
         data: dataLastMeal,
@@ -174,41 +222,68 @@ export default function NutritionView() {
         }
     };
 
+
     const handleReportDailyNutrition = async () => {
-        try {
-            const response = await API.Nutrition.getReportDailyNutrition();
+        const reportPromise = API.Nutrition.getReportDailyNutrition()
+            .then((response) => {
+                if (response && response.reportUrl) {
+                    window.open(response.reportUrl, '_blank');
+                    return response;
+                } else {
+                    throw new Error("Failed to generate or retrieve the report link.");
+                }
+            });
 
-            if (response && response.reportUrl) {
-                const pdfUrl = response.reportUrl;
-
-                window.open(pdfUrl, '_blank');
-
-                toast.success("Detailed report opened in a new tab.");
-
-            } else {
-                toast.error("Failed to generate or retrieve the report link.");
-            }
-        } catch (error) {
-            const errorMessage = error.message || "Failed to open report. Please try again.";
-            toast.error(errorMessage);
-        }
-    }
+        toast.promise(reportPromise, {
+            loading: 'Generating your detailed report...',
+            success: 'Report opened successfully in a new tab!',
+            error: (err) => err.message || 'Failed to generate report. Please try again.',
+        });
+    };
 
     React.useEffect(() => {
         fetchFood(1);
     }, []);
 
+    const formattedWeeklyBarData = React.useMemo(() => {
+        if (!dataWeeklyNutrition?.formattedCalories) return getPastSevenDaysData();
+
+        return dataWeeklyNutrition.formattedCalories.map(item => {
+            const numericCalories = parseFloat(String(item.totalCalories).replace(' kcal', ''));
+            const date = moment(item.date).format('DD/MM/YYYY');
+            const dayName = moment(item.date).format('ddd').slice(0, 3);
+
+            return {
+                day: dayName,
+                intake: numericCalories,
+                date: date,
+            };
+        });
+    }, [dataWeeklyNutrition]);
+
     const formattedWeeklyData = React.useMemo(() => {
         if (!dataWeeklyNutrition?.formattedCalories) return [];
 
         return dataWeeklyNutrition.formattedCalories.map(item => {
-            const numericCalories = parseFloat(item.totalCalories.replace(' kcal', ''));
+            const numericCalories = parseFloat(String(item.totalCalories).replace(' kcal', ''));
             return {
                 date: item.date,
                 calories: numericCalories,
             };
         });
     }, [dataWeeklyNutrition]);
+
+    const handleBarClick = (data) => {
+        if (selectedDate === data.date) {
+            setSelectedDate(getTodayDateStringDisplay());
+            toast.info(`Viewing nutrition for Today.`);
+        } else {
+            setSelectedDate(data.date);
+            toast.info(`Viewing nutrition for ${data.day} (${data.date}).`);
+        }
+    };
+
+    const isTodaySelected = selectedDate === getTodayDateStringDisplay();
 
     return (
         <div className="p-4 lg:p-8 space-y-5 lg:space-y-8 min-h-screen bg-[#F8F8F8]">
@@ -220,9 +295,11 @@ export default function NutritionView() {
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
                             <CardTitle className="text-xl font-bold text-gray-800">
-                                Nutrition Overview
+                                Nutrition Overview {isTodaySelected ? "(Today)" : `(${selectedDate})`}
                             </CardTitle>
-                            <p className="text-sm text-gray-500">See how your meals stack up today.</p>
+                            <p className="text-sm text-gray-500">
+                                See how your meals stack up {isTodaySelected ? "today" : `on ${selectedDate}`}.
+                            </p>
                         </div>
                         <Button
                             size="sm"
@@ -241,35 +318,58 @@ export default function NutritionView() {
                             <div className="lg:col-span-2 space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
-                                        {renderStatCardContent("Calories Consumed", dataDailyNutrition?.totalNutrition?.calories, dataDailyNutrition?.lastNutrition?.calories, isDailyLoading)}
+                                        {renderStatCardContent(
+                                            "Calories Consumed",
+                                            dataDailyNutrition?.totalNutrition?.calories,
+                                            dataDailyNutrition?.lastNutrition?.calories,
+                                            isDailyLoading
+                                        )}
                                     </Card>
                                     <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
-                                        {renderStatCardContent("Proteins", dataDailyNutrition?.totalNutrition?.protein, dataDailyNutrition?.lastNutrition?.protein, isDailyLoading)}
+                                        {renderStatCardContent(
+                                            "Proteins",
+                                            dataDailyNutrition?.totalNutrition?.protein,
+                                            dataDailyNutrition?.lastNutrition?.protein,
+                                            isDailyLoading
+                                        )}
                                     </Card>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
-                                        {renderStatCardContent("Carbohydrates", formatNutritionValue(dataDailyNutrition?.totalNutrition?.carbs), formatNutritionValue(dataDailyNutrition?.lastNutrition?.carbs), isDailyLoading)}
+                                        {renderStatCardContent(
+                                            "Carbohydrates",
+                                            formatNutritionValue(dataDailyNutrition?.totalNutrition?.carbs),
+                                            formatNutritionValue(dataDailyNutrition?.lastNutrition?.carbs),
+                                            isDailyLoading
+                                        )}
                                     </Card>
                                     <Card className="text-center p-4 rounded-md shadow-sm border-2 border-gray-100">
-                                        {renderStatCardContent("Fats", formatNutritionValue(dataDailyNutrition?.totalNutrition?.fat), formatNutritionValue(dataDailyNutrition?.lastNutrition?.fat), isDailyLoading)}
+                                        {renderStatCardContent(
+                                            "Fats",
+                                            formatNutritionValue(dataDailyNutrition?.totalNutrition?.fat),
+                                            formatNutritionValue(dataDailyNutrition?.lastNutrition?.fat),
+                                            isDailyLoading
+                                        )}
                                     </Card>
                                 </div>
                             </div>
 
                             <div className="lg:col-span-3 p-5 rounded-2xl bg-white border border-gray-100">
                                 <h3 className="text-base font-semibold mb-4 text-gray-800">Caloric Intake</h3>
-                                <ChartContainer config={barChartConfig} className="h-[200px] w-full">
-                                    <BarChart accessibilityLayer data={dailyIntakeData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                <ChartContainer config={barChartConfig} className="w-full h-[250px]">
+                                    <BarChart accessibilityLayer data={formattedWeeklyBarData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                                         <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
                                         <ChartTooltip content={<ChartTooltipContent
-                                            labelFormatter={(day) => `Hari ${day}`}
-                                            nameFormatter={() => "Kalori"}
+                                            labelFormatter={(data) => `${data} (${formattedWeeklyBarData.find(d => d.day === data)?.date})`}
+                                            nameFormatter={() => "Calories"}
+                                            valueFormatter={(value) => `${value} kcal`}
                                         />} />
                                         <Bar
                                             dataKey="intake"
                                             fill="#ff90a7"
                                             radius={[4, 4, 0, 0]}
+                                            onClick={handleBarClick}
+                                            shape={(props) => <CustomBar {...props} selectedDate={selectedDate} />}
                                         />
                                     </BarChart>
                                 </ChartContainer>
@@ -343,7 +443,7 @@ export default function NutritionView() {
                                     <ChartTooltip
                                         content={<ChartTooltipContent
                                             labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
-                                            nameFormatter={() => "Kalori"}
+                                            nameFormatter={() => "Calories"}
                                             valueFormatter={(value) => `${value} kcal`}
                                         />}
                                     />

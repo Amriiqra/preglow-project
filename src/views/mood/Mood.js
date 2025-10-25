@@ -14,10 +14,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import * as API from "@/core/services/api";
 import { useFormik } from 'formik'
 import { toast } from 'sonner';
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import { MoodHistoryItemSkeleton, MoodSkeleton } from "@/components/shared/skeleton/MoodSkeleton";
 import { MoodDetailDialog } from "./MoodDetailDialog";
 import { cleanPercentage } from "@/config/global";
+import { MoodHistoryItem } from "./MoodHistoryItem";
 
 const moods = [
     { label: "Happy", icon: "😊" },
@@ -64,58 +65,18 @@ const MoodSelector = ({ selectedMood, onSelectMood }) => (
     </div>
 );
 
-const getMoodEmoji = (category) => {
-    switch (category) {
-        case "Happy": return "😊";
-        case "Sad": return "😞";
-        case "Anxious": return "😟";
-        case "Angry": return "😡";
-        case "Bored": return "😒";
-        case "Irritated": return "😤";
-        case "Moody": return "😔";
-        case "Sensitive": return "🥺";
-        case "Tired": return "😴";
-        case "Loved": return "😍";
-        default: return "🙂";
-    }
-};
-
-const MoodHistoryItem = ({ item, onClick }) => {
-    const truncatedText = item.daily_feelings.length > 200 ? item.daily_feelings.slice(0, 200) + "..." : item.daily_feelings;
-    const date = new Date(item.createdAt).toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-    });
-
-    return (
-        <Card
-            className="p-4 shadow-none border border-primary h-full gap-2 mb-2 cursor-pointer hover:bg-primary/5 transition-colors"
-            onClick={() => onClick(item)}
-        >
-            <p className="text-2xl font-bold text-gray-800">{date}</p>
-            <p className="text-sm font-semibold text-primary flex items-center gap-1">
-                <span className="text-lg">{getMoodEmoji(item.category)}</span> {item.category}
-            </p>
-            <p className="text-sm text-gray-600 leading-relaxed">
-                {truncatedText}
-            </p>
-        </Card>
-    );
-};
-
-
 export default function MoodView() {
     const [selectedMood, setSelectedMood] = React.useState(null);
     const [selectedDuration, setSelectedDuration] = React.useState('Today');
-    const [dailyMood, setDailyMood] = React.useState([]);
     const [currentPage, setCurrentPage] = React.useState(1);
-    const [hasMore, setHasMore] = React.useState(true);
-    const [isLoadingMore, setIsLoadingMore] = React.useState(false);
-    const [isInitialLoading, setIsInitialLoading] = React.useState(true);
     const observerTarget = React.useRef(null);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [selectedMoodDetail, setSelectedMoodDetail] = React.useState(null);
+    const [deleteDialog, setDeleteDialog] = React.useState({
+        open: false,
+        id: null
+    });
+    const [accumulatedMoods, setAccumulatedMoods] = React.useState([]);
 
     const limit = 10;
 
@@ -136,31 +97,30 @@ export default function MoodView() {
         mutate
     } = useSWR(['moodData', selectedDuration], getMoodData);
 
-    const fetchListDailyMood = async (page) => {
-        try {
-            if (page === 1) {
-                setIsInitialLoading(true);
+    const {
+        data: moodListData,
+        isLoading: isMoodListLoading,
+        mutate: mutateMoodList
+    } = useSWR(
+        ['moodList', currentPage],
+        () => API.Mood.getAllDailyMood({ page: currentPage, limit })
+    );
+
+    React.useEffect(() => {
+        if (moodListData) {
+            if (currentPage === 1) {
+                setAccumulatedMoods(moodListData.moods);
             } else {
-                setIsLoadingMore(true);
+                setAccumulatedMoods(prev => {
+                    const existingIds = new Set(prev.map(item => item._id));
+                    const newMoods = moodListData.moods.filter(item => !existingIds.has(item._id));
+                    return [...prev, ...newMoods];
+                });
             }
-
-            const data = await API.Mood.getAllDailyMood({ page, limit });
-
-            if (page === 1) {
-                setDailyMood(data.moods);
-            } else {
-                setDailyMood(prev => [...prev, ...data.moods]);
-            }
-
-            setHasMore(page < data.totalPages);
-        } catch (error) {
-            console.error("Error fetching moods:", error);
-            toast.error("Failed to load moods. Please try again.");
-        } finally {
-            setIsInitialLoading(false);
-            setIsLoadingMore(false);
         }
-    };
+    }, [moodListData, currentPage]);
+
+    const hasMore = moodListData ? currentPage < moodListData.totalPages : true;
 
     const { moodChartData, moodChartConfig, mainMood } = React.useMemo(() => {
         if (!dataDailyMood || !dataDailyMood.mood_count || dataDailyMood.mood_count.length === 0) {
@@ -223,13 +183,9 @@ export default function MoodView() {
             try {
                 const saveMoodPromise = API.Mood.saveDailyMood(values);
 
-                toast.promise(saveMoodPromise, {
+                await toast.promise(saveMoodPromise, {
                     loading: "Saving your mood...",
                     success: (data) => {
-                        resetForm();
-                        setSelectedMood(null);
-                        mutate();
-                        fetchListDailyMood(1);
                         return data.message || "Mood saved successfully!";
                     },
                     error: (err) => {
@@ -237,7 +193,24 @@ export default function MoodView() {
                     },
                 });
 
-                await saveMoodPromise;
+                resetForm();
+                setSelectedMood(null);
+
+                await globalMutate(
+                    key => Array.isArray(key) && key[0] === 'moodList',
+                    undefined,
+                    { revalidate: false }
+                );
+
+                setAccumulatedMoods([]);
+
+                const freshData = await API.Mood.getAllDailyMood({ page: 1, limit });
+                setAccumulatedMoods(freshData.moods);
+
+                setCurrentPage(1);
+
+                mutate();
+
             } catch (error) {
                 console.error("Save mood failed:", error);
             } finally {
@@ -246,19 +219,45 @@ export default function MoodView() {
         },
     });
 
+    const handleConfirmDelete = async () => {
+        const { id } = deleteDialog || {};
+        if (!id) return;
+
+        try {
+            const deleteMoodPromise = API.Mood.delete(id);
+
+            toast.promise(deleteMoodPromise, {
+                loading: 'Deleting mood...',
+                success: 'Mood deleted successfully!',
+                error: (error) => `Failed to delete mood! ${error.message}`,
+            });
+
+            await globalMutate(
+                key => Array.isArray(key) && key[0] === 'moodList',
+                undefined,
+                { revalidate: false }
+            );
+            setAccumulatedMoods([]);
+            const freshData = await API.Mood.getAllDailyMood({ page: 1, limit });
+            setAccumulatedMoods(freshData.moods);
+            setCurrentPage(1);
+            mutate();
+        } catch (error) {
+            console.error("Delete mood failed:", error);
+        } finally {
+            setDeleteDialog({ open: false, id: null });
+        }
+    };
+
     const handleMoodItemClick = (moodItem) => {
         setSelectedMoodDetail(moodItem);
         setIsDialogOpen(true);
     };
 
     React.useEffect(() => {
-        fetchListDailyMood(1);
-    }, []);
-
-    React.useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore && !isInitialLoading) {
+                if (entries[0].isIntersecting && hasMore && !isMoodListLoading) {
                     setCurrentPage(prev => prev + 1);
                 }
             },
@@ -275,13 +274,7 @@ export default function MoodView() {
             }
             observer.disconnect();
         };
-    }, [hasMore, isLoadingMore, isInitialLoading]);
-
-    React.useEffect(() => {
-        if (currentPage > 1) {
-            fetchListDailyMood(currentPage);
-        }
-    }, [currentPage]);
+    }, [hasMore, isMoodListLoading]);
 
     React.useEffect(() => {
         if (selectedMood) {
@@ -434,34 +427,34 @@ export default function MoodView() {
                 </Card>
             </div>
             <ScrollArea className="h-[600px] w-full">
-                {isInitialLoading && dailyMood.length === 0 ? (
+                {isMoodListLoading && currentPage === 1 ? (
                     <div className="space-y-4">
                         {[...Array(6)].map((_, i) => <MoodHistoryItemSkeleton key={i} />)}
                     </div>
-                ) : dailyMood.length > 0 ? (
+                ) : accumulatedMoods.length > 0 ? (
                     <div className="space-y-4">
-                        {dailyMood.map((item, index) => (
+                        {accumulatedMoods.map((item) => (
                             <MoodHistoryItem
-                                key={item._id || index}
+                                key={item._id}
                                 item={item}
                                 onClick={handleMoodItemClick}
+                                deleteDialog={deleteDialog}
+                                setDeleteDialog={setDeleteDialog}
+                                handleConfirmDelete={handleConfirmDelete}
                             />
                         ))}
                     </div>
                 ) : (
-                    !isInitialLoading && (
-                        <p className="text-center text-gray-500 col-span-full">
-                            No moods available. Be the first to add one!
-                        </p>
-                    )
+                    <p className="text-center text-gray-500 col-span-full">
+                        No moods available. Be the first to add one!
+                    </p>
                 )}
 
-
-                {isLoadingMore && (
+                {isMoodListLoading && currentPage > 1 && (
                     <p className="text-center text-primary/70 py-4">Loading more moods...</p>
                 )}
 
-                {hasMore && !isInitialLoading && !isLoadingMore && (
+                {hasMore && !isMoodListLoading && (
                     <div ref={observerTarget} className="h-1" />
                 )}
             </ScrollArea>

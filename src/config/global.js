@@ -42,19 +42,22 @@ export const formatNumber = (number) => {
 };
 
 export const formatNutritionValue = (value) => {
-    if (!value) return "0 g";
+    if (!value || typeof value !== 'string' || value.trim() === "") return null;
 
     const parts = value.trim().split(" ");
     let numberStr = parts[0];
-    const unit = parts.length > 1 ? ` ${parts[1]}` : "";
+
+    const unit = parts.length > 1 ? ` ${parts[1]}` : " g";
 
     try {
         const number = parseFloat(numberStr);
+
         if (isNaN(number)) return value;
+
+        if (number === 0) return `0.0${unit}`;
 
         return number.toFixed(1) + unit;
     } catch (e) {
-        console.error("Formatting error:", e);
         return value;
     }
 };

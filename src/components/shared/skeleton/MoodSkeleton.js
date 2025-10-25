@@ -92,7 +92,6 @@ export function MoodSkeleton() {
             </div>
 
             <div className="mt-8 space-y-4">
-                <h2 className="text-2xl font-bold text-secondary">Mood History</h2>
                 <div className="space-y-4">
                     {[...Array(5)].map((_, i) => (
                         <MoodHistoryItemSkeleton key={i} />

@@ -83,6 +83,11 @@ export const Mood = {
 
     saveDailyMood: (data) =>
         handleRequest(axiosInstance.post("/menu/mood/add-feelings", data)),
+
+    delete: (id) =>
+        handleRequest(
+            axiosInstance.delete(`/menu/mood/delete/${id}`)
+        ),
 };
 
 export const Affirmation = {
@@ -135,8 +140,13 @@ export const Nutrition = {
         );
     },
 
-    getDailyNutrition: () =>
-        handleRequest(axiosInstance.get("/menu/food/daily-nutrition")),
+    getDailyNutrition: (params = {}) => {
+        return handleRequest(
+            axiosInstance.get("/menu/food/nutrition", {
+                params: { ...params }
+            })
+        );
+    },
 
     getWeeklyNutrition: () =>
         handleRequest(axiosInstance.get("/menu/food/weekly-nutrition")),
