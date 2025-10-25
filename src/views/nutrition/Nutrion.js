@@ -293,7 +293,7 @@ export default function NutritionView() {
 
             <Card className="rounded-2xl shadow-lg border-none">
                 <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex lg:flex-row flex-col lg:items-center lg:gap-0 gap-3 justify-between">
                         <div className="space-y-1">
                             <CardTitle className="text-xl font-bold text-gray-800">
                                 Nutrition Overview {isTodaySelected ? "(Today)" : `(${selectedDate})`}
