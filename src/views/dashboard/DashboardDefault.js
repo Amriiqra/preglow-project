@@ -351,22 +351,22 @@ export default function DashboardDefault() {
                 <div className="grid lg:grid-cols-4 gap-4">
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Calories Consumed</p>
-                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.calories}</p>
+                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.calories || 0}</p>
                     <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.calories}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Proteins</p>
-                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.protein}</p>
+                    <p className="text-2xl font-medium">{dataDailyNutrition?.totalNutrition?.protein || 0}</p>
                     <p className="text-sm text-green-500">{dataDailyNutrition?.lastNutrition?.protein}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Carbohydrates</p>
-                    <p className="text-2xl font-medium">{formatNutritionValue(dataDailyNutrition?.totalNutrition?.carbs)}</p>
+                    <p className="text-2xl font-medium">{formatNutritionValue(dataDailyNutrition?.totalNutrition?.carbs) || 0}</p>
                     <p className="text-sm text-green-500">{formatNutritionValue(dataDailyNutrition?.lastNutrition?.carbs)}</p>
                   </Card>
                   <Card className="text-start gap-0 p-4 rounded-md shadow-none text-secondary">
                     <p>Fats</p>
-                    <p className="text-2xl font-medium">{formatNutritionValue(dataDailyNutrition?.totalNutrition?.fat)}</p>
+                    <p className="text-2xl font-medium">{formatNutritionValue(dataDailyNutrition?.totalNutrition?.fat) || 0}</p>
                     <p className="text-sm text-green-500">{formatNutritionValue(dataDailyNutrition?.lastNutrition?.fat)}</p>
                   </Card>
                 </div>

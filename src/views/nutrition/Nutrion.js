@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import * as API from "@/core/services/api";
 import useSWR from "swr";
-import { BarChart, Bar, AreaChart, Area, XAxis } from "recharts";
+import { BarChart, Bar, AreaChart, Area, XAxis, YAxis } from "recharts";
 import {
     ChartContainer,
     ChartTooltip,
@@ -124,19 +124,19 @@ const FeaturedRecentMeal = ({ data }) => (
         <div className="grid grid-cols-2 gap-4 flex-grow">
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
                 <p className="lg:text-2xl text-xl text-gray-500">Calories Consumed</p>
-                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.calories}</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.calories || 0}</p>
             </div>
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
                 <p className="lg:text-2xl text-xl text-gray-500">Proteins</p>
-                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.protein}</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.protein || 0}</p>
             </div>
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
                 <p className="lg:text-2xl text-xl text-gray-500">Carbohydrates</p>
-                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.carbs}</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.carbs || 0}</p>
             </div>
             <div className="text-center p-2 rounded-md border flex flex-col items-center justify-center border-gray-200">
                 <p className="lg:text-2xl text-xl text-gray-500">Fats</p>
-                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.fat}</p>
+                <p className="lg:text-xl text-lg font-bold text-gray-800">{data?.fat || 0}</p>
             </div>
         </div>
     </div>
@@ -257,6 +257,7 @@ export default function NutritionView() {
                 day: dayName,
                 intake: numericCalories,
                 date: date,
+                calories: item.totalCalories,
             };
         });
     }, [dataWeeklyNutrition]);
@@ -357,13 +358,30 @@ export default function NutritionView() {
                             <div className="lg:col-span-3 p-5 rounded-2xl bg-white border border-gray-100">
                                 <h3 className="text-base font-semibold mb-4 text-gray-800">Caloric Intake</h3>
                                 <ChartContainer config={barChartConfig} className="w-full h-[250px]">
-                                    <BarChart accessibilityLayer data={formattedWeeklyBarData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                    <BarChart
+                                        accessibilityLayer
+                                        data={formattedWeeklyBarData}
+                                        margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                                    >
                                         <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
-                                        <ChartTooltip content={<ChartTooltipContent
-                                            labelFormatter={(data) => `${data} (${formattedWeeklyBarData.find(d => d.day === data)?.date})`}
-                                            nameFormatter={() => "Calories"}
-                                            valueFormatter={(value) => `${value} kcal`}
-                                        />} />
+                                        <YAxis
+                                            tickLine={false}
+                                            axisLine={false}
+                                            domain={[0, 'auto']}
+                                            hide
+                                        />
+                                        <ChartTooltip
+                                            content={<ChartTooltipContent
+                                                labelFormatter={(day) => {
+                                                    const item = formattedWeeklyBarData.find(d => d.day === day);
+                                                    return `${day} (${item?.date})`;
+                                                }}
+                                                nameFormatter={() => "Calories"}
+                                                valueFormatter={(value, name, item) => {
+                                                    return item.payload.calories;
+                                                }}
+                                            />}
+                                        />
                                         <Bar
                                             dataKey="intake"
                                             fill="#ff90a7"
@@ -422,6 +440,9 @@ export default function NutritionView() {
 
                         <Card className="shadow-none border-2 border-gray-100 p-6 rounded-2xl relative overflow-hidden">
                             <h3 className="text-base font-bold text-gray-800 mb-4">Caloric Intake per Meal</h3>
+                            {dataWeeklyNutrition?.categoryCalories?.length === 0 && (
+                                <p className="text-sm text-gray-500 col-span-4 text-center">No meal data available for this week.</p>
+                            )}
                             <div className="grid grid-cols-4 gap-4">
                                 {dataWeeklyNutrition?.categoryCalories?.map((meal, index) => (
                                     <MealItem
